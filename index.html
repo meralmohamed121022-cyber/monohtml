@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Online Viewer</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/eclipse.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; transition: 0.3s; }
+body.dark-mode { background-color: #222; color: white; }
+body.light-mode { background-color: #f4f4f4; color: black; }
+
+.sidebar { width: 220px; padding: 15px; display: flex; flex-direction: column; gap: 10px; transition: 0.3s; overflow-y: auto; z-index: 10; }
+body.dark-mode .sidebar { background-color: #333; border-right: 1px solid #444; }
+body.light-mode .sidebar { background-color: #fff; border-right: 1px solid #ccc; }
+
+.sidebar h2 { text-align: center; font-size: 16px; margin: 0 0 15px 0; }
+.sidebar button, .file-upload-label { padding: 10px; border: none; cursor: pointer; text-align: left; font-size: 14px; border-radius: 4px; font-weight: bold; }
+
+body.dark-mode .sidebar button, body.dark-mode .file-upload-label { background-color: #555; color: white; }
+body.light-mode .sidebar button, body.light-mode .file-upload-label { background-color: #e0e0e0; color: black; }
+.sidebar button:hover, .file-upload-label:hover { filter: brightness(1.2); }
+
+.main-area { display: flex; flex: 1; overflow: hidden; }
+.editor-box { flex: 1; display: flex; flex-direction: column; width: 50%; border-right: 2px solid #888; overflow: hidden; position: relative; }
+.preview-box { flex: 1; display: flex; flex-direction: column; width: 50%; background: white; overflow: auto; }
+iframe { flex: 1; width: 100%; height: 100%; border: none; }
+
+.CodeMirror { height: 100% !important; font-size: 15px; font-family: monospace; }
+.CodeMirror-activeline-background { background: rgba(255, 255, 255, 0.1) !important; }
+body.light-mode .CodeMirror-activeline-background { background: rgba(0, 0, 0, 0.05) !important; }
+
+input[type="file"] { display: none; }
+
+/* Custom Search & Replace UI */
+.cm-searching { background-color: rgba(255, 255, 0, 0.5); }
+body.light-mode .cm-searching { background-color: rgba(255, 215, 0, 0.5); }
+
+.search-panel {
+    position: absolute; top: 10px; right: 20px; z-index: 100;
+    background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    width: 320px; display: none; flex-direction: column; gap: 10px;
+}
+body.dark-mode .search-panel { background: #2b2b2b; color: white; border: 1px solid #555; box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+
+.search-header { display: flex; justify-content: space-between; font-weight: bold; align-items: center; }
+.search-header span { font-size: 15px; }
+.search-header button { background: none; border: none; cursor: pointer; color: inherit; font-size: 16px; }
+
+.search-inputs { display: flex; align-items: center; gap: 10px; background: #f4f4f4; padding: 8px; border-radius: 4px; border: 1px solid #ddd; }
+body.dark-mode .search-inputs { background: #1e1e1e; border-color: #444; }
+.search-inputs input { border: none; background: transparent; outline: none; flex: 1; color: inherit; font-size: 14px; }
+.search-inputs span { font-size: 12px; color: #888; white-space: nowrap; font-weight: bold; }
+
+.search-actions { display: flex; gap: 5px; }
+.search-actions button { flex: 1; padding: 8px; cursor: pointer; border: none; background: #007bff; color: white; border-radius: 4px; font-weight: bold; }
+.search-actions button:hover { background: #0056b3; }
+.search-actions .nav-btn { flex: 0.5; background: #6c757d; }
+.search-actions .nav-btn:hover { background: #5a6268; }
+</style>
+</head>
+<body class="dark-mode">
+
+<div class="sidebar">
+<h2>HTML Viewer</h2>
+<button id="btnTheme">Toggle Theme 🌙/☀️</button>
+<label class="file-upload-label">
+    Import File 📁
+    <input type="file" id="fileInput" accept=".html,.js,.css,.txt">
+</label>
+<button id="btnPreview">Run Preview ▶️</button>
+<button id="btnNewTab">Preview in New Tab 🌐</button>
+<button id="btnSearch">Find & Replace 🔍</button>
+<button id="btnExportHtml">Export HTML 📄</button>
+<button id="btnExportImg">Export Image 🖼️</button>
+<button id="btnExportPdf">Export PDF 📑</button>
+<button id="btnClear">Clear 🗑️</button>
+</div>
+
+<div class="main-area">
+<div class="editor-box">
+    
+    <div id="searchPanel" class="search-panel">
+        <div class="search-header">
+            <span>Find & Replace</span>
+            <button onclick="closeSearch()">✖</button>
+        </div>
+        <div class="search-inputs">
+            <input type="text" id="searchInput" placeholder="Search for...">
+            <span id="matchCount">0 of 0</span>
+        </div>
+        <div class="search-inputs">
+            <input type="text" id="replaceInput" placeholder="Replace with...">
+        </div>
+        <div class="search-actions">
+            <button class="nav-btn" onclick="prevMatch()">▲</button>
+            <button class="nav-btn" onclick="nextMatch()">▼</button>
+            <button onclick="replaceMatch()">Replace</button>
+            <button onclick="replaceAllMatches()">All</button>
+        </div>
+    </div>
+
+    <textarea id="htmlInput"></textarea>
+</div>
+<div class="preview-box"><iframe id="previewFrame"></iframe></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/search/searchcursor.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/selection/active-line.min.js"></script>
+
+<script>
+const editor = CodeMirror.fromTextArea(document.getElementById('htmlInput'), {
+    mode: 'htmlmixed',
+    theme: 'monokai',
+    lineNumbers: true,
+    autoCloseTags: true,
+    lineWrapping: true,
+    styleActiveLine: true 
+});
+
+const previewFrame = document.getElementById('previewFrame');
+
+function updatePreview() {
+    previewFrame.srcdoc = editor.getValue();
+}
+
+editor.on('change', updatePreview);
+document.getElementById('btnPreview').addEventListener('click', updatePreview);
+
+document.getElementById('btnNewTab').addEventListener('click', function() {
+    const newWin = window.open();
+    newWin.document.open();
+    newWin.document.write(editor.getValue());
+    newWin.document.close();
+});
+
+document.getElementById('btnClear').addEventListener('click', function() {
+    editor.setValue('');
+    updatePreview();
+});
+
+document.getElementById('btnTheme').addEventListener('click', function() {
+    const isDark = document.body.classList.contains('dark-mode');
+    document.body.classList.toggle('dark-mode', !isDark);
+    document.body.classList.toggle('light-mode', isDark);
+    editor.setOption('theme', isDark ? 'eclipse' : 'monokai');
+});
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        editor.setValue(e.target.result);
+        updatePreview();
+    };
+    reader.readAsText(file);
+});
+
+document.getElementById('btnExportHtml').addEventListener('click', function() {
+    const blob = new Blob([editor.getValue()], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'code.html';
+    a.click();
+    URL.revokeObjectURL(url);
+});
+
+document.getElementById('btnExportImg').addEventListener('click', function() {
+    html2canvas(previewFrame.contentDocument.body).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'preview.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+});
+
+document.getElementById('btnExportPdf').addEventListener('click', function() {
+    html2pdf().from(previewFrame.contentDocument.body).save('preview.pdf');
+});
+
+// ================= Custom Search & Replace Logic =================
+let searchCursor = null;
+let query = "";
+let matchIndex = 0;
+let totalMatches = 0;
+let searchOverlay = null;
+
+function updateMatchCount() {
+    query = document.getElementById('searchInput').value;
+    let countSpan = document.getElementById('matchCount');
+    
+    if (!query) {
+        countSpan.innerText = '0 of 0';
+        if (searchOverlay) editor.removeOverlay(searchOverlay);
+        return;
+    }
+    
+    let cursor = editor.getSearchCursor(query);
+    totalMatches = 0;
+    while (cursor.findNext()) { totalMatches++; }
+    
+    if (totalMatches > 0) {
+        matchIndex = 1;
+        countSpan.innerText = matchIndex + ' of ' + totalMatches;
+        searchCursor = editor.getSearchCursor(query);
+        searchCursor.findNext();
+        editor.setSelection(searchCursor.from(), searchCursor.to());
+        editor.scrollIntoView({from: searchCursor.from(), to: searchCursor.to()}, 100);
+    } else {
+        countSpan.innerText = '0 of 0';
+    }
+    
+    if (searchOverlay) editor.removeOverlay(searchOverlay);
+    searchOverlay = {
+        token: function(stream) {
+            let safeQuery = query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+            let re = new RegExp(safeQuery, "gi");
+            re.lastIndex = stream.pos;
+            let match = re.exec(stream.string);
+            if (match && match.index === stream.pos) {
+                stream.pos += match[0].length;
+                return "searching";
+            } else if (match) {
+                stream.pos = match.index;
+            } else {
+                stream.skipToEnd();
+            }
+        }
+    };
+    editor.addOverlay(searchOverlay);
+}
+
+document.getElementById('searchInput').addEventListener('input', updateMatchCount);
+
+function nextMatch() {
+    if (!searchCursor || totalMatches === 0) return;
+    if (!searchCursor.findNext()) {
+        searchCursor = editor.getSearchCursor(query);
+        searchCursor.findNext();
+        matchIndex = 1;
+    } else {
+        matchIndex++;
+    }
+    document.getElementById('matchCount').innerText = matchIndex + ' of ' + totalMatches;
+    editor.setSelection(searchCursor.from(), searchCursor.to());
+    editor.scrollIntoView({from: searchCursor.from(), to: searchCursor.to()}, 100);
+}
+
+function prevMatch() {
+    if (!searchCursor || totalMatches === 0) return;
+    if (!searchCursor.findPrevious()) {
+        searchCursor = editor.getSearchCursor(query);
+        while(searchCursor.findNext()){}
+        searchCursor.findPrevious();
+        matchIndex = totalMatches;
+    } else {
+        matchIndex--;
+    }
+    document.getElementById('matchCount').innerText = matchIndex + ' of ' + totalMatches;
+    editor.setSelection(searchCursor.from(), searchCursor.to());
+    editor.scrollIntoView({from: searchCursor.from(), to: searchCursor.to()}, 100);
+}
+
+function replaceMatch() {
+    if (!searchCursor || totalMatches === 0) return;
+    let replaceText = document.getElementById('replaceInput').value;
+    searchCursor.replace(replaceText);
+    updateMatchCount();
+}
+
+function replaceAllMatches() {
+    let replaceText = document.getElementById('replaceInput').value;
+    if (!query) return;
+    let cursor = editor.getSearchCursor(query);
+    while (cursor.findNext()) {
+        cursor.replace(replaceText);
+    }
+    updateMatchCount();
+}
+
+document.getElementById('btnSearch').addEventListener('click', function() {
+    let panel = document.getElementById('searchPanel');
+    panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+    if (panel.style.display === 'flex') {
+        document.getElementById('searchInput').focus();
+        let selectedText = editor.getSelection();
+        if (selectedText) {
+            document.getElementById('searchInput').value = selectedText;
+            updateMatchCount();
+        }
+    } else {
+        closeSearch();
+    }
+});
+
+function closeSearch() {
+    document.getElementById('searchPanel').style.display = 'none';
+    if (searchOverlay) {
+        editor.removeOverlay(searchOverlay);
+        searchOverlay = null;
+    }
+    editor.focus();
+}
+</script>
+</body>
+</html>

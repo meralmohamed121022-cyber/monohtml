@@ -3,403 +3,227 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HTML Online Viewer PRO</title>
+<title>MONO-CODE-SHOW</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/eclipse.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldgutter.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/lint/lint.min.css">
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ext-language_tools.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.9/beautify-html.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.13.6/jshint.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/htmlhint/0.11.4/htmlhint.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/csslint/1.0.5/csslint.js"></script>
-
 <style>
-body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; transition: 0.3s; overflow: hidden; }
+/* Layout */
+body { margin: 0; display: flex; flex-direction: column; height: 100vh; font-family: Arial, sans-serif; transition: 0.3s; overflow: hidden; }
+body.dark-mode { background-color: #0d1117; color: #c9d1d9; }
+body.light-mode { background-color: #f6f8fa; color: #24292e; }
 
-body.dark-mode { background-color: #0a192f; color: #ffffff; }
-body.light-mode { background-color: #f4f6f8; color: #333333; }
+/* Navigation Bar */
+.topbar { width: 100%; padding: 12px 15px; display: flex; flex-direction: row; align-items: center; gap: 10px; transition: 0.3s; z-index: 10; box-sizing: border-box; flex-wrap: wrap; }
+body.dark-mode .topbar { background-color: #161b22; border-bottom: 2px solid #003366; }
+body.light-mode .topbar { background-color: #ffffff; border-bottom: 2px solid #003366; }
+.topbar h2 { margin: 0 15px 0 0; font-size: 16px; color: #ff8c00; font-weight: bold; }
 
-.sidebar { width: 220px; padding: 15px; display: flex; flex-direction: column; gap: 10px; transition: 0.3s; overflow-y: auto; z-index: 10; }
-body.dark-mode .sidebar { background-color: #112240; border-right: 1px solid #233554; }
-body.light-mode .sidebar { background-color: #ffffff; border-right: 1px solid #e2e8f0; }
+/* Contact & Avatar */
+.contact-section { display: flex; align-items: center; gap: 10px; margin-left: auto; padding-right: 10px; }
+.mo-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #ff8c00; box-shadow: 2px 2px 0px #003366; object-fit: cover; }
+.social-icons { display: flex; gap: 8px; }
+.social-icons a { text-decoration: none; color: #ffffff; background: #003366; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px; border: 1.5px solid #003366; box-shadow: 2px 2px 0px #ff8c00; transition: 0.2s; }
+.social-icons a:hover { transform: translateY(-2px); background: #ff8c00; box-shadow: 2px 2px 0px #003366; }
 
-.sidebar h2 { text-align: center; font-size: 16px; margin: 0 0 15px 0; color: #ff8c00; }
-.sidebar button, .file-upload-label { padding: 10px; border: none; cursor: pointer; text-align: left; font-size: 14px; border-radius: 4px; font-weight: bold; transition: 0.2s; }
+/* Responsive Device Selectors */
+.device-selector { display: flex; gap: 5px; background: rgba(0, 51, 102, 0.1); padding: 5px; border-radius: 20px; border: 1px solid #003366; }
+.device-btn { background: none !important; border: none !important; box-shadow: none !important; color: #003366 !important; font-size: 16px !important; padding: 5px 10px !important; border-radius: 15px !important; cursor: pointer; transition: 0.3s; }
+.device-btn.active { background-color: #ff8c00 !important; color: white !important; }
+body.dark-mode .device-btn { color: #c9d1d9 !important; }
 
-body.dark-mode .sidebar button, body.dark-mode .file-upload-label { background-color: #1a365d; color: #ffffff; }
-body.dark-mode .sidebar button:hover, body.dark-mode .file-upload-label:hover { background-color: #ff8c00; }
+/* 3D Action Buttons */
+.topbar button, .file-upload-label { padding: 8px 14px; cursor: pointer; text-align: center; font-size: 13px; border-radius: 25px; font-weight: bold; transition: all 0.2s ease; white-space: nowrap; display: flex; align-items: center; gap: 5px; background-color: #003366; color: #ffffff; border: 2px solid #003366; box-shadow: 4px 4px 0px #ff8c00; }
+.topbar button:hover, .file-upload-label:hover { background-color: #ff8c00; box-shadow: 4px 4px 0px #003366; transform: translateY(-2px); }
+.topbar button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #003366; }
 
-body.light-mode .sidebar button, body.light-mode .file-upload-label { background-color: #e2e8f0; color: #1a202c; }
-body.light-mode .sidebar button:hover, body.light-mode .file-upload-label:hover { background-color: #ff8c00; color: #ffffff; }
+/* Editor & Preview */
+.main-area { display: flex; flex: 1; width: 100%; overflow: hidden; position: relative; }
+.editor-box { width: 50%; height: 100%; display: flex; flex-direction: column; position: relative; }
+.preview-box { flex: 1; height: 100%; display: flex; flex-direction: column; background: #e0e0e0; overflow: auto; align-items: center; padding-top: 20px; transition: 0.3s; }
+#previewFrame { width: 100%; height: 100%; border: none; background-color: #ffffff; transition: 0.4s; box-shadow: 0 0 20px rgba(0,0,0,0.2); }
+#previewFrame.mobile { width: 375px; height: 667px; border: 12px solid #333; border-radius: 30px; }
+#previewFrame.tablet { width: 768px; height: 1024px; border: 15px solid #333; border-radius: 20px; }
 
-.main-area { display: flex; flex: 1; overflow: hidden; }
-.editor-box { flex: 1; display: flex; flex-direction: column; width: 50%; border-right: 2px solid #ff8c00; position: relative; }
-.preview-box { flex: 1; display: flex; flex-direction: column; width: 50%; background: #ffffff; }
-iframe { flex: 1; width: 100%; height: 100%; border: none; background-color: #ffffff; }
+.resizer { width: 6px; background-color: #ff8c00; cursor: col-resize; z-index: 500; transition: 0.2s; border-left: 1px solid #003366; border-right: 1px solid #003366;}
+#htmlInput { flex: 1; width: 100%; height: 100%; font-size: 15px; }
 
-.CodeMirror { height: 100% !important; font-size: 15px; font-family: monospace; transition: 0.3s; }
-body.dark-mode .CodeMirror { background-color: #0a192f !important; color: #ffffff !important; }
-body.dark-mode .CodeMirror-gutters { background-color: #112240 !important; border-right: 1px solid #233554 !important; }
-body.dark-mode .CodeMirror-linenumber { color: #8892b0 !important; }
-body.dark-mode .CodeMirror-activeline-background { background: rgba(255, 140, 0, 0.1) !important; }
-body.dark-mode .CodeMirror-cursor { border-left: 2px solid #ff8c00 !important; }
+/* Draggable Search Panel */
+.search-panel { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; padding: 15px; border-radius: 25px; width: 300px; display: none; flex-direction: column; gap: 10px; border: 3px solid #003366; box-shadow: 6px 6px 0px #ff8c00; background: #ffffff; }
+body.dark-mode .search-panel { background: #161b22; }
 
-body.light-mode .CodeMirror { background-color: #ffffff !important; color: #333333 !important; }
-body.light-mode .CodeMirror-gutters { background-color: #f8fafc !important; border-right: 1px solid #e2e8f0 !important; }
-body.light-mode .CodeMirror-linenumber { color: #64748b !important; }
-body.light-mode .CodeMirror-activeline-background { background: rgba(255, 140, 0, 0.1) !important; }
-body.light-mode .CodeMirror-cursor { border-left: 2px solid #ff8c00 !important; }
-
-body.dark-mode .cm-s-monokai .cm-tag { color: #ff8c00 !important; font-weight: bold; }
-body.dark-mode .cm-s-monokai .cm-string { color: #a3e635 !important; }
-body.dark-mode .cm-s-monokai .cm-keyword { color: #60a5fa !important; font-weight: bold; }
-body.dark-mode .cm-s-monokai .cm-variable { color: #ffffff !important; }
-body.dark-mode .cm-s-monokai .cm-def { color: #facc15 !important; }
-
-input[type="file"] { display: none; }
-
-.search-panel { position: absolute; top: 10px; right: 20px; z-index: 100; padding: 15px; border-radius: 8px; width: 320px; display: none; flex-direction: column; gap: 10px; transition: 0.3s; }
-body.dark-mode .search-panel { background: #112240; box-shadow: 0 4px 15px rgba(0,0,0,0.6); border: 1px solid #233554; }
-body.light-mode .search-panel { background: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-
-.search-header { display: flex; justify-content: space-between; font-weight: bold; align-items: center; color: #ff8c00; }
-.search-header span { font-size: 15px; }
-.search-header button { background: none; border: none; cursor: pointer; font-size: 16px; }
-body.dark-mode .search-header button { color: #ffffff; }
-body.light-mode .search-header button { color: #333333; }
-
-.search-inputs { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 4px; }
-body.dark-mode .search-inputs { background: #0a192f; border: 1px solid #233554; }
-body.light-mode .search-inputs { background: #f8fafc; border: 1px solid #e2e8f0; }
-
-.search-inputs input { border: none; background: transparent; outline: none; flex: 1; font-size: 14px; }
-body.dark-mode .search-inputs input { color: #ffffff; }
-body.light-mode .search-inputs input { color: #333333; }
-
-.search-inputs span { font-size: 12px; white-space: nowrap; font-weight: bold; }
-body.dark-mode .search-inputs span { color: #8892b0; }
-body.light-mode .search-inputs span { color: #64748b; }
-
-.search-actions { display: flex; gap: 5px; }
-.search-actions button { flex: 1; padding: 8px; cursor: pointer; border: none; background: #ff8c00; color: #ffffff; border-radius: 4px; font-weight: bold; }
-.search-actions button:hover { background: #e07b00; }
-.search-actions .nav-btn { flex: 0.5; }
-body.dark-mode .search-actions .nav-btn { background: #1a365d; }
-body.dark-mode .search-actions .nav-btn:hover { background: #233554; }
-body.light-mode .search-actions .nav-btn { background: #94a3b8; }
-body.light-mode .search-actions .nav-btn:hover { background: #64748b; }
-
-.cm-searching { background-color: rgba(255, 140, 0, 0.5); }
+/* Custom Syntax Colors (Red/Dark Blue) */
+.ace_dark.ace_editor .ace_keyword, .ace_dark.ace_editor .ace_xml.ace_tag { color: #ff7b72 !important; }
+.ace_dark.ace_editor .ace_attribute-name { color: #0066cc !important; font-weight: bold; }
+.ace_dark.ace_editor .ace_string { color: #a6e22e !important; }
 </style>
 </head>
-<body class="dark-mode">
+<body class="light-mode">
 
-<div class="sidebar">
-<h2>HTML Viewer PRO</h2>
-<button id="btnNewTab">Preview in New Tab 🌐</button>
-<button id="btnTheme">Toggle Theme 🌙/☀️</button>
-<label class="file-upload-label">
-    Import File 📁
-    <input type="file" id="fileInput" accept=".html,.js,.css,.txt,.json">
-</label>
-<button id="btnPreview">Run Preview ▶️</button>
-<button id="btnSearch">Find & Replace 🔍</button>
-<button id="btnExportHtml">Export HTML 📄</button>
-<button id="btnExportJson">Export JSON 📦</button>
-<button id="btnExportImg">Export Image 🖼️</button>
-<button id="btnExportPdf">Export PDF 📑</button>
-<button id="btnClear">Clear 🗑️</button>
+<div class="topbar">
+    <h2>MONO-HTML-SHOW</h2>
+    <button id="btnNewTab">🌐 New Tab</button>
+    <button id="btnTheme">🌙/☀️ Theme</button>
+    <div class="device-selector">
+        <button class="device-btn active" onclick="setViewport('laptop', this)"><i class="fas fa-laptop"></i></button>
+        <button class="device-btn" onclick="setViewport('tablet', this)"><i class="fas fa-tablet-alt"></i></button>
+        <button class="device-btn" onclick="setViewport('mobile', this)"><i class="fas fa-mobile-alt"></i></button>
+    </div>
+    <button onclick="formatCode()">✨ Format</button>
+    <label class="file-upload-label">📁 Import<input type="file" id="fileInput" style="display:none"></label>
+    <button id="btnSearch">🔍 Search</button>
+    <button id="btnExportHtml">📄 HTML</button>
+    <button id="btnExportJson">📦 JSON</button>
+    <button id="btnExportImg">🖼️ PHOTO</button>
+    <button id="btnExportPdf">📑 PDF</button>
+    <button id="btnClear">🗑️ Clear</button>
+
+    <div class="contact-section">
+        <img src="https://github.com/meralmohamed121022-cyber/Drug-Monograph/blob/main/6_20251129_184528_0005.png?raw=true" alt="Mo" class="mo-avatar">
+        <div class="social-icons">
+            <a href="https://wa.me/966541932559" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://facebook.com/mohamed.kholeif.92" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        </div>
+    </div>
 </div>
 
 <div class="main-area">
-<div class="editor-box">
-    <div id="searchPanel" class="search-panel">
-        <div class="search-header">
-            <span>Find & Replace</span>
-            <button onclick="closeSearch()">✖</button>
+    <div class="editor-box" id="editorBox">
+        <div id="searchPanel" class="search-panel">
+            <div id="searchHeader" style="display:flex; justify-content:space-between; cursor:move; color:#ff8c00; font-weight:bold; border-bottom:2px solid #003366; padding-bottom:5px;">
+                <span>✥ DRAG SEARCH</span>
+                <span onclick="closeSearch()" style="cursor:pointer">✖</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:20px; border:2px solid #003366; background:#f0f4f8; margin-top:10px;">
+                <input type="text" id="searchInput" placeholder="Find..." style="border:none; background:transparent; outline:none; flex:1; font-weight:bold; color:#003366;">
+                <span id="matchStatus" style="font-size:11px; font-weight:bold; color:#ff8c00;">0 matches</span>
+            </div>
+            <input type="text" id="replaceInput" placeholder="Replace..." style="padding:8px 12px; border-radius:20px; border:2px solid #003366; background:#f0f4f8; font-weight:bold; color:#003366; outline:none;">
+            <div style="display:flex; gap:6px;">
+                <button onclick="editor.findPrevious()" style="flex:0.3; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">▲</button>
+                <button onclick="editor.findNext()" style="flex:0.3; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">▼</button>
+                <button onclick="editor.replace(document.getElementById('replaceInput').value)" style="flex:1; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">Replace</button>
+            </div>
         </div>
-        <div class="search-inputs">
-            <input type="text" id="searchInput" placeholder="Search for...">
-            <span id="matchCount">0 of 0</span>
-        </div>
-        <div class="search-inputs">
-            <input type="text" id="replaceInput" placeholder="Replace with...">
-        </div>
-        <div class="search-actions">
-            <button class="nav-btn" onclick="prevMatch()">▲</button>
-            <button class="nav-btn" onclick="nextMatch()">▼</button>
-            <button onclick="replaceMatch()">Replace</button>
-            <button onclick="replaceAllMatches()">All</button>
-        </div>
+        <div id="htmlInput"></div>
     </div>
-    <textarea id="htmlInput"></textarea>
+    <div class="resizer" id="resizer"></div>
+    <div class="preview-box" id="previewBox"><iframe id="previewFrame"></iframe></div>
 </div>
-<div class="preview-box"><iframe id="previewFrame"></iframe></div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/search/searchcursor.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/selection/active-line.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldgutter.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/brace-fold.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/xml-fold.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/lint/lint.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/lint/javascript-lint.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/lint/html-lint.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/lint/css-lint.min.js"></script>
 
 <script>
-const editor = CodeMirror.fromTextArea(document.getElementById('htmlInput'), {
-    mode: 'htmlmixed',
-    theme: 'monokai',
-    lineNumbers: true,
-    autoCloseTags: true,
-    lineWrapping: true,
-    styleActiveLine: true,
-    matchBrackets: true,
-    autoCloseBrackets: true,
-    foldGutter: true,
-    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
-    lint: true
-});
+const editor = ace.edit("htmlInput");
+editor.setTheme("ace/theme/textmate");
+editor.session.setMode("ace/mode/html");
+editor.setOptions({ fontSize: "15px", wrap: true, useWorker: false });
 
 const previewFrame = document.getElementById('previewFrame');
+const updatePreview = () => { 
+    previewFrame.srcdoc = editor.getValue(); 
+    previewFrame.onload = () => applyResponsiveZoom();
+};
+editor.session.on('change', updatePreview);
 
-function updatePreview() {
-    previewFrame.srcdoc = editor.getValue();
+function getDocTitle() {
+    const match = editor.getValue().match(/<title>(.*?)<\/title>/i);
+    return (match && match[1]) ? match[1].trim().replace(/[/\\?%*:|"<>]/g, '-') : 'document';
 }
 
-editor.on('change', updatePreview);
-document.getElementById('btnPreview').addEventListener('click', updatePreview);
+function setViewport(device, btn) {
+    document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    previewFrame.className = device === 'laptop' ? '' : device;
+}
 
-document.getElementById('btnTheme').addEventListener('click', function() {
-    const isDark = document.body.classList.contains('dark-mode');
-    document.body.classList.toggle('dark-mode', !isDark);
-    document.body.classList.toggle('light-mode', isDark);
-    editor.setOption('theme', isDark ? 'eclipse' : 'monokai');
-});
+// Exports
+document.getElementById('btnExportHtml').onclick = () => {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([editor.getValue()], {type:'text/html'}));
+    link.download = getDocTitle() + '.html';
+    link.click();
+};
 
-// تفعيل تحديد الدالة بالكامل عند الضغط المزدوج على القوس
-editor.on('dblclick', function(cm, event) {
-    let pos = cm.getCursor();
-    let match = cm.findMatchingBracket(pos);
-    if (match && match.match) {
-        let from = match.forward ? match.from : match.to;
-        let to = match.forward ? match.to : match.from;
-        to.ch += 1; 
-        cm.setSelection(from, to);
-    }
-});
+document.getElementById('btnExportJson').onclick = () => {
+    const data = { title: getDocTitle(), code: editor.getValue(), timestamp: new Date() };
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 4)], {type:'application/json'}));
+    link.download = getDocTitle() + '.json';
+    link.click();
+};
 
-document.getElementById('btnNewTab').addEventListener('click', function() {
-    const newWin = window.open();
-    newWin.document.open();
-    newWin.document.write(editor.getValue());
-    newWin.document.close();
-});
-
-document.getElementById('btnClear').addEventListener('click', function() {
-    editor.setValue('');
-    updatePreview();
-});
-
-document.getElementById('fileInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        editor.setValue(e.target.result);
-        updatePreview();
-    };
-    reader.readAsText(file);
-});
-
-document.getElementById('btnExportHtml').addEventListener('click', function() {
-    const blob = new Blob([editor.getValue()], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'code.html';
-    a.click();
-    URL.revokeObjectURL(url);
-});
-
-document.getElementById('btnExportJson').addEventListener('click', function() {
-    const blob = new Blob([editor.getValue()], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'code.json';
-    a.click();
-    URL.revokeObjectURL(url);
-});
-
-document.getElementById('btnExportImg').addEventListener('click', function() {
-    html2canvas(previewFrame.contentDocument.body).then(canvas => {
+document.getElementById('btnExportImg').onclick = () => {
+    const el = previewFrame.contentDocument.body;
+    el.style.zoom = "1";
+    html2canvas(el, { useCORS: true, scale: 2 }).then(canvas => {
         const link = document.createElement('a');
-        link.download = 'preview.png';
+        link.download = getDocTitle() + '.png';
         link.href = canvas.toDataURL();
         link.click();
+        applyResponsiveZoom();
     });
-});
+};
 
-document.getElementById('btnExportPdf').addEventListener('click', function() {
-    let previewBody = previewFrame.contentDocument.body;
-    let originalBg = previewBody.style.backgroundColor;
-    // فرض خلفية بيضاء قبل استخراج الـ PDF لضمان وضوح المحتوى
-    previewBody.style.backgroundColor = '#ffffff'; 
-
-    let opt = {
-        margin: 0.5,
-        filename: 'preview.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-    
-    html2pdf().set(opt).from(previewBody).save().then(() => {
-        // إرجاع الخلفية لأصلها بعد التحميل
-        previewBody.style.backgroundColor = originalBg; 
+document.getElementById('btnExportPdf').onclick = () => {
+    const el = previewFrame.contentDocument.body;
+    el.style.zoom = "1";
+    if (!el.style.backgroundColor || el.style.backgroundColor === 'transparent') el.style.backgroundColor = '#ffffff';
+    html2canvas(el, { useCORS: true, scale: 2 }).then(canvas => {
+        const imgW = 210, pdfH = Math.max(297, (canvas.height * imgW) / canvas.width);
+        html2pdf().set({ margin: 0, filename: getDocTitle() + '.pdf', jsPDF: { unit: 'mm', format: [imgW, pdfH] } }).from(canvas).save().then(() => applyResponsiveZoom());
     });
-});
+};
 
-let searchCursor = null;
-let query = "";
-let matchIndex = 0;
-let totalMatches = 0;
-let searchOverlay = null;
+document.getElementById('btnNewTab').onclick = () => {
+    const win = window.open();
+    win.document.write(editor.getValue());
+    win.document.close();
+};
 
-function updateMatchCount() {
-    query = document.getElementById('searchInput').value;
-    let countSpan = document.getElementById('matchCount');
-    
-    if (!query) {
-        countSpan.innerText = '0 of 0';
-        if (searchOverlay) editor.removeOverlay(searchOverlay);
-        return;
-    }
-    
-    let cursor = editor.getSearchCursor(query);
-    totalMatches = 0;
-    while (cursor.findNext()) { totalMatches++; }
-    
-    if (totalMatches > 0) {
-        matchIndex = 1;
-        countSpan.innerText = matchIndex + ' of ' + totalMatches;
-        searchCursor = editor.getSearchCursor(query);
-        searchCursor.findNext();
-        editor.setSelection(searchCursor.from(), searchCursor.to());
-        editor.scrollIntoView({from: searchCursor.from(), to: searchCursor.to()}, 100);
-    } else {
-        countSpan.innerText = '0 of 0';
-    }
-    
-    if (searchOverlay) editor.removeOverlay(searchOverlay);
-    searchOverlay = {
-        token: function(stream) {
-            let safeQuery = query.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-            let re = new RegExp(safeQuery, "gi");
-            re.lastIndex = stream.pos;
-            let match = re.exec(stream.string);
-            if (match && match.index === stream.pos) {
-                stream.pos += match[0].length;
-                return "searching";
-            } else if (match) {
-                stream.pos = match.index;
-            } else {
-                stream.skipToEnd();
-            }
-        }
-    };
-    editor.addOverlay(searchOverlay);
+// Search & Drag
+const panel = document.getElementById("searchPanel"), header = document.getElementById("searchHeader");
+let isDragging = false, offset = [0, 0];
+header.onmousedown = (e) => { isDragging = true; offset = [panel.offsetLeft - e.clientX, panel.offsetTop - e.clientY]; };
+document.onmousemove = (e) => { if (isDragging) { panel.style.left = (e.clientX + offset[0]) + "px"; panel.style.top = (e.clientY + offset[1]) + "px"; panel.style.transform = "none"; } };
+document.onmouseup = () => isDragging = false;
+function closeSearch() { panel.style.display = 'none'; editor.focus(); }
+
+document.getElementById('searchInput').oninput = function() {
+    document.getElementById('matchStatus').innerText = editor.findAll(this.value, { wrap: true }) + " matches";
+};
+
+document.getElementById('btnSearch').onclick = () => {
+    panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+    if (panel.style.display === 'flex') document.getElementById('searchInput').focus();
+};
+
+document.getElementById('btnTheme').onclick = () => {
+    const isDark = document.body.classList.toggle('dark-mode');
+    document.body.classList.toggle('light-mode', !isDark);
+    editor.setTheme(isDark ? "ace/theme/monokai" : "ace/theme/textmate");
+};
+
+function formatCode() { editor.setValue(html_beautify(editor.getValue(), { indent_size: 4 }), -1); }
+document.getElementById('btnClear').onclick = () => { editor.setValue(''); updatePreview(); };
+
+// Resizer
+const resizer = document.getElementById('resizer'), editorBox = document.getElementById('editorBox');
+let isResizing = false;
+resizer.onmousedown = () => isResizing = true;
+window.onmousemove = (e) => { if (isResizing) { let p = (e.clientX / window.innerWidth) * 100; if (p > 10 && p < 90) editorBox.style.width = p + '%'; } };
+window.onmouseup = () => isResizing = false;
+
+function applyResponsiveZoom() {
+    const doc = previewFrame.contentDocument; if (!doc?.body) return;
+    doc.body.style.zoom = '1';
+    let cw = doc.documentElement.scrollWidth, vw = previewFrame.clientWidth;
+    if (cw > vw && vw > 0) doc.body.style.zoom = vw / cw;
 }
-
-document.getElementById('searchInput').addEventListener('input', updateMatchCount);
-
-function nextMatch() {
-    if (!searchCursor || totalMatches === 0) return;
-    if (!searchCursor.findNext()) {
-        searchCursor = editor.getSearchCursor(query);
-        searchCursor.findNext();
-        matchIndex = 1;
-    } else {
-        matchIndex++;
-    }
-    document.getElementById('matchCount').innerText = matchIndex + ' of ' + totalMatches;
-    editor.setSelection(searchCursor.from(), searchCursor.to());
-    editor.scrollIntoView({from: searchCursor.from(), to: searchCursor.to()}, 100);
-}
-
-function prevMatch() {
-    if (!searchCursor || totalMatches === 0) return;
-    if (!searchCursor.findPrevious()) {
-        searchCursor = editor.getSearchCursor(query);
-        while(searchCursor.findNext()){}
-        searchCursor.findPrevious();
-        matchIndex = totalMatches;
-    } else {
-        matchIndex--;
-    }
-    document.getElementById('matchCount').innerText = matchIndex + ' of ' + totalMatches;
-    editor.setSelection(searchCursor.from(), searchCursor.to());
-    editor.scrollIntoView({from: searchCursor.from(), to: searchCursor.to()}, 100);
-}
-
-function replaceMatch() {
-    if (!searchCursor || totalMatches === 0) return;
-    let replaceText = document.getElementById('replaceInput').value;
-    searchCursor.replace(replaceText);
-    updateMatchCount();
-}
-
-function replaceAllMatches() {
-    let replaceText = document.getElementById('replaceInput').value;
-    if (!query) return;
-    let cursor = editor.getSearchCursor(query);
-    while (cursor.findNext()) {
-        cursor.replace(replaceText);
-    }
-    updateMatchCount();
-}
-
-document.getElementById('btnSearch').addEventListener('click', function() {
-    let panel = document.getElementById('searchPanel');
-    panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
-    if (panel.style.display === 'flex') {
-        document.getElementById('searchInput').focus();
-        let selectedText = editor.getSelection();
-        if (selectedText) {
-            document.getElementById('searchInput').value = selectedText;
-            updateMatchCount();
-        }
-    } else {
-        closeSearch();
-    }
-});
-
-function closeSearch() {
-    document.getElementById('searchPanel').style.display = 'none';
-    if (searchOverlay) {
-        editor.removeOverlay(searchOverlay);
-        searchOverlay = null;
-    }
-    editor.focus();
-}
+new ResizeObserver(() => applyResponsiveZoom()).observe(document.getElementById('previewBox'));
 </script>
 </body>
 </html>

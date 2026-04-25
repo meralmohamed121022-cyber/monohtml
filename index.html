@@ -146,6 +146,16 @@ body.dark-mode .editor-box { background: #001122 !important; }
     .editor-tabs { flex-wrap: wrap; }
     .tab-btn { flex: 1 1 50%; border-bottom: 1px solid rgba(255,255,255,0.1); }
 }
+/* الوضع الرأسي الافتراضي */
+.editor-box { width: 50%; height: 100%; display: flex; flex-direction: column; order: 1; }
+.resizer { width: 6px; background-color: #ff8c00; cursor: col-resize; z-index: 500; order: 2; }
+.preview-box { flex: 1; height: 100%; display: flex; flex-direction: column; order: 3; }
+
+/* الوضع الأفقي (الرفيو فوق والأكواد تحت) */
+.main-area.horizontal-layout { flex-direction: column; }
+.main-area.horizontal-layout .preview-box { width: 100% !important; height: 50%; order: 1; }
+.main-area.horizontal-layout .resizer { width: 100% !important; height: 8px; cursor: row-resize; order: 2; border-top: 2px solid #003366; }
+.main-area.horizontal-layout .editor-box { width: 100% !important; height: 50%; order: 3; }
 </style>
 </head>
 <body class="light-mode">
@@ -319,23 +329,33 @@ function toggleLayout() {
     isHorizontal = !isHorizontal;
     const mainArea = document.querySelector('.main-area');
     const editorBox = document.getElementById('editorBox');
+    const previewBox = document.getElementById('previewBox');
     const btn = document.getElementById('btnLayout');
     
     if (isHorizontal) {
         mainArea.classList.add('horizontal-layout');
-        editorBox.style.width = '100%';
+        // تصفير العرض عشان ياخد 100% من الكلاس الجديد
+        editorBox.style.width = ''; 
         editorBox.style.height = '50%';
+        previewBox.style.width = '';
+        previewBox.style.height = '50%';
         btn.innerHTML = '<i class="fas fa-columns"></i> Vertical';
     } else {
         mainArea.classList.remove('horizontal-layout');
-        editorBox.style.height = '100%';
+        // تصفير الارتفاع عشان يرجع ياخد 100% في الوضع الرأسي
+        editorBox.style.height = ''; 
         editorBox.style.width = '50%';
+        previewBox.style.height = '';
+        previewBox.style.width = '50%';
         btn.innerHTML = '<i class="fas fa-layer-group"></i> Horizontal';
     }
-    editor.resize();
-    applyResponsiveZoom();
+    
+    // تأكيد إعادة التحجيم بعد التغيير
+    setTimeout(() => {
+        editor.resize();
+        applyResponsiveZoom();
+    }, 50);
 }
-
 // FILE IMPORT
 document.getElementById('fileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];

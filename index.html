@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONO-CODE-SHOW</title>
+<meta name="description" content="Depanto Code Editor: Online Preview for HTML, CSS, JavaScript. Best code playground for web developers.">
+<meta name="keywords" content="HTML, CSS, JavaScript, Code Editor, Preview, Live Compiler, Web Development, Programming Languages, Mono System, Depanto, Script Tester, Front-end Tool, محرر أكواد, لغات البرمجة, تجربة الكود">
+<meta name="author" content="Mohamed Kholeif">
+
+<meta property="og:title" content="Depanto Code Previewer - Online Programming Editor">
+<meta property="og:description" content="Explore and test your HTML/CSS/JS code instantly with Depanto Editor.">
+<meta property="og:url" content="https://your-domain.com">
+<meta property="og:type" content="website">
+<title>Depanto-MONO | Online HTML CSS JS Preview & Editor</title>
 
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/meralmohamed121022-cyber/photos/refs/heads/main/007bff.png">
 
@@ -15,7 +24,24 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.4/beautify-html.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Depanto Code Editor",
+  "operatingSystem": "Windows, MacOS, Android, iOS",
+  "applicationCategory": "DeveloperApplication",
+  "author": {
+    "@type": "Person",
+    "name": "Mohamed Kholeif"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
 <style>
 /* Layout */
 body { margin: 0; display: flex; flex-direction: column; height: 100vh; font-family: Arial, sans-serif; transition: 0.3s; overflow: hidden; }
@@ -647,6 +673,27 @@ function updateMatchCount() {
 
     status.innerText = (total > 0) ? `${current} of ${total}` : "0 matches";
 }
+
+</script>
+<script>
+    // 1. منع الكليك يمين تماماً
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // 2. منع اختصارات لوحة المفاتيح (F12, Ctrl+U, Ctrl+Shift+I, Ctrl+S)
+    document.onkeydown = function(e) {
+        if (e.keyCode == 123 || // F12
+            (e.ctrlKey && e.keyCode == 85) || // Ctrl+U (View Source)
+            (e.ctrlKey && e.shiftKey && e.keyCode == 73) || // Ctrl+Shift+I (Inspect)
+            (e.ctrlKey && e.shiftKey && e.keyCode == 74) || // Ctrl+Shift+J (Console)
+            (e.ctrlKey && e.keyCode == 83) || // Ctrl+S (Save)
+            (e.ctrlKey && e.keyCode == 72)    // Ctrl+H (History)
+        ) {
+            return false;
+        }
+    };
+
+    // 3. تعطيل خاصية السحب والإفلات للأكواد (اختياري)
+    document.addEventListener('dragstart', (e) => e.preventDefault());
 </script>
 </body>
 </html>

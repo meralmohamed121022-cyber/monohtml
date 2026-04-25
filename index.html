@@ -209,10 +209,10 @@ body.dark-mode .editor-box { background: #001122 !important; }
             <button id="btnLayout" onclick="toggleLayout()"><i class="fas fa-layer-group"></i> Horizontal</button>
             <button id="btnTheme"><i class="fas fa-moon"></i> Theme</button>
             <div class="device-selector">
-                <button class="device-btn active" onclick="setViewport('laptop', this)"><i class="fas fa-laptop"></i></button>
-                <button class="device-btn" onclick="setViewport('tablet', this)"><i class="fas fa-tablet-alt"></i></button>
-                <button class="device-btn" onclick="setViewport('mobile', this)"><i class="fas fa-mobile-alt"></i></button>
-            </div>
+    <button class="device-btn" onclick="setViewport('laptop', this)"><i class="fas fa-laptop"></i></button>
+    <button class="device-btn" onclick="setViewport('tablet', this)"><i class="fas fa-tablet-alt"></i></button>
+    <button class="device-btn active" onclick="setViewport('mobile', this)"><i class="fas fa-mobile-alt"></i></button>
+</div>
         </div>
 
         <div class="tool-group">
@@ -262,8 +262,7 @@ body.dark-mode .editor-box { background: #001122 !important; }
     <div class="resizer" id="resizer"></div>
     
     <div class="preview-box" id="previewBox">
-        <iframe id="previewFrame"></iframe>
-    </div>
+<iframe id="previewFrame" class="mobile"></iframe>    </div>
 </div>
 
 <script>

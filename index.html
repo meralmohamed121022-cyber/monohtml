@@ -57,7 +57,17 @@ body.dark-mode .brand-section { border-right: 2px dashed rgba(255, 255, 255, 0.1
 
 /* Avatar & Social */
 .mo-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #ff8c00; box-shadow: 2px 2px 0px #003366; object-fit: cover; }
-.social-icons { display: flex; gap: 6px; }
+.social-icons { 
+    display: flex; 
+    flex-direction: row; /* يخليهم بالعرض */
+    gap: 6px; 
+}
+.contact-section { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; /* المسافة بين الصورة والأيقونات */
+    transition: 0.3s; 
+}
 .social-icons a { text-decoration: none; color: #ffffff; background: #003366; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; border: 1.5px solid #003366; box-shadow: 2px 2px 0px #ff8c00; transition: 0.2s; }
 
 /* Toolbar Content */
@@ -124,8 +134,13 @@ body.dark-mode .editor-box { background: #001122 !important; }
 /* MOBILE RESPONSIVE MEDIA QUERIES */
 @media (max-width: 768px) {
     .topbar { flex-direction: column; padding: 10px; height: auto; }
-    .brand-section { flex-direction: row; justify-content: space-between; border-right: none; border-bottom: 2px dashed rgba(0, 51, 102, 0.2); padding-right: 0; padding-bottom: 10px; width: 100%; align-items: center; }
-    .toolbar-content { flex-direction: column; width: 100%; gap: 8px; align-items: stretch; margin-top: 10px; }
+.brand-section { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    border-right: 2px dashed rgba(0, 51, 102, 0.2); 
+    padding-right: 15px; 
+}    .toolbar-content { flex-direction: column; width: 100%; gap: 8px; align-items: stretch; margin-top: 10px; }
     .tool-group { flex-wrap: wrap; justify-content: center; border-right: none; border-bottom: 1px solid rgba(0, 51, 102, 0.2); padding-right: 0; padding-bottom: 8px; }
     .tool-group:last-child { border-bottom: none; padding-bottom: 0; }
     .editor-tabs { flex-wrap: wrap; }

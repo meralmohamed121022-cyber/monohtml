@@ -241,25 +241,20 @@ body.dark-mode .editor-box { background: #001122 !important; }
             <button class="tab-btn" onclick="switchTab('js', this)"><i class="fab fa-js"></i> JS</button>
         </div>
 
-        <div id="searchPanel" class="search-panel">
-            <div id="searchHeader" style="display:flex; justify-content:space-between; cursor:move; color:#ff8c00; font-weight:bold; border-bottom:2px solid #003366; padding-bottom:5px;">
-                <span>✥ DRAG SEARCH</span>
-                <span onclick="closeSearch()" style="cursor:pointer">✖</span>
-            </div>
-            <div class="search-inputs" style="display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:20px; border:2px solid #003366; background:#f0f4f8; margin-top:10px;">
-                <input type="text" id="searchInput" placeholder="Search for..." style="border:none; background:transparent; outline:none; flex:1; font-weight:bold; color:#555;">
-                <span id="matchStatus" style="font-size:11px; font-weight:bold; color:#ff8c00;">0 matches</span>
-            </div>
-            <div class="search-inputs" style="display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:20px; border:2px solid #003366; background:#f0f4f8;">
-                <input type="text" id="replaceInput" placeholder="Replace with..." style="border:none; background:transparent; outline:none; flex:1; font-weight:bold; color:#555;">
-            </div>
-            <div style="display:flex; gap:6px;">
-                <button onclick="editor.findPrevious(); updateMatchCount();" style="flex:0.3; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">▲</button>
-                <button onclick="editor.findNext(); updateMatchCount();" style="flex:0.3; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">▼</button>
-                <button onclick="editor.replace(document.getElementById('replaceInput').value); updateMatchCount();" style="flex:1; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">Replace</button>
-                <button onclick="editor.replaceAll(document.getElementById('replaceInput').value); updateMatchCount();" style="flex:1; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">All</button>
-            </div>
-        </div>
+        <div id="searchPanel" class="search-panel" style="padding: 8px; width: 300px; background: #ffffff; border: 3px solid #003366; border-radius: 20px; box-shadow: 4px 4px 0px #ff8c00; flex-direction: column; gap: 8px; display: none;">
+    <div class="search-inputs" style="display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:15px; border:2px solid #003366; background:#f0f4f8;">
+        <input type="text" id="searchInput" placeholder="Search..." style="border:none; background:transparent; outline:none; flex:1; font-weight:bold; color:#555; width:40%;">
+        <span id="matchStatus" style="font-size:11px; font-weight:bold; color:#ff8c00; white-space:nowrap;">0 matches</span>
+        <button onclick="editor.findPrevious(); updateMatchCount();" style="background:none; border:none; color:#003366; cursor:pointer; padding:0 2px; font-size:14px;" title="Previous">▲</button>
+        <button onclick="editor.findNext(); updateMatchCount();" style="background:none; border:none; color:#003366; cursor:pointer; padding:0 2px; font-size:14px;" title="Next">▼</button>
+        <button onclick="closeSearch()" style="background:none; border:none; color:#dc2626; cursor:pointer; padding:0 2px; font-size:15px; font-weight:bold; margin-left: 2px;" title="Close">✖</button>
+    </div>
+    <div class="search-inputs" style="display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:15px; border:2px solid #003366; background:#f0f4f8;">
+        <input type="text" id="replaceInput" placeholder="Replace..." style="border:none; background:transparent; outline:none; flex:1; font-weight:bold; color:#555; width:50%;">
+        <button onclick="editor.replace(document.getElementById('replaceInput').value); updateMatchCount();" style="background:#003366; color:white; border-radius:10px; border:none; padding:4px 8px; font-size:12px; cursor:pointer; font-weight:bold;">Rep</button>
+        <button onclick="editor.replaceAll(document.getElementById('replaceInput').value); updateMatchCount();" style="background:#003366; color:white; border-radius:10px; border:none; padding:4px 8px; font-size:12px; cursor:pointer; font-weight:bold;">All</button>
+    </div>
+</div>
         
         <div id="htmlInput"></div>
     </div>
@@ -606,36 +601,6 @@ document.getElementById("btnTheme").onclick = () => {
     editor.setTheme(isDark ? "ace/theme/monokai" : "ace/theme/textmate");
 };
 
-setTimeout(() => {
-    const searchBtns = document.querySelectorAll("#searchPanel button");
-    if(searchBtns.length >= 4) {
-        searchBtns[0].removeAttribute("onclick");
-        searchBtns[0].onclick = () => {
-            editor.findPrevious({ wrap: true });
-            updateMatchCount();
-        };
-        
-        searchBtns[1].removeAttribute("onclick");
-        searchBtns[1].onclick = () => {
-            editor.findNext({ wrap: true });
-            updateMatchCount();
-        };
-        
-        searchBtns[2].removeAttribute("onclick");
-        searchBtns[2].onclick = () => {
-            const replaceStr = document.getElementById("replaceInput").value;
-            editor.replace(replaceStr);
-            updateMatchCount();
-        };
-        
-        searchBtns[3].removeAttribute("onclick");
-        searchBtns[3].onclick = () => {
-            const replaceStr = document.getElementById("replaceInput").value;
-            editor.replaceAll(replaceStr);
-            updateMatchCount();
-        };
-    }
-}, 500);
 
 function formatCode() { 
     let val = editor.getValue();
@@ -739,7 +704,27 @@ new ResizeObserver(() => applyResponsiveZoom()).observe(document.getElementById(
     };
 
     // 3. تعطيل خاصية السحب والإفلات للأكواد (اختياري)
-    document.addEventListener('dragstart', (e) => e.preventDefault());
+    
+document.addEventListener('dragstart', (e) => e.preventDefault());
+window.closeSearch = function() { 
+    document.getElementById("searchPanel").style.display = "none";
+    editor.focus();
+};
+// القفل من أي مكان في الصفحة أو مربعات البحث
+document.addEventListener('keydown', function(e) {
+    if (e.key === "Escape") {
+        closeSearch();
+    }
+});
+
+// القفل لو المؤشر جوه المحرر نفسه
+editor.commands.addCommand({
+    name: "closeSearchBox",
+    bindKey: {win: "Esc", mac: "Esc"},
+    exec: function(editor) {
+        closeSearch();
+    }
+});
 </script>
 </script>
 </body>

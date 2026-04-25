@@ -202,10 +202,10 @@ body.dark-mode .editor-box { background: #001122 !important; }
                 <input type="text" id="replaceInput" placeholder="Replace with..." style="border:none; background:transparent; outline:none; flex:1; font-weight:bold; color:#555;">
             </div>
             <div style="display:flex; gap:6px;">
-                <button onclick="editor.findPrevious()" style="flex:0.3; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">▲</button>
-                <button onclick="editor.findNext()" style="flex:0.3; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">▼</button>
-                <button onclick="editor.replace(document.getElementById('replaceInput').value)" style="flex:1; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">Replace</button>
-                <button onclick="editor.replaceAll(document.getElementById('replaceInput').value)" style="flex:1; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">All</button>
+                <button onclick="editor.findPrevious(); updateMatchCount();" style="flex:0.3; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">▲</button>
+                <button onclick="editor.findNext(); updateMatchCount();" style="flex:0.3; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">▼</button>
+                <button onclick="editor.replace(document.getElementById('replaceInput').value); updateMatchCount();" style="flex:1; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">Replace</button>
+                <button onclick="editor.replaceAll(document.getElementById('replaceInput').value); updateMatchCount();" style="flex:1; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">All</button>
             </div>
         </div>
         
@@ -276,7 +276,7 @@ const previewFrame = document.getElementById('previewFrame');
 
 function getCompiledCode() {
     const htmlCode = sessions.html.getValue();
-    const cssCode = sessions.css.getValue() ? `<style>${sessions.css.getValue()}<\/style>` : '';
+    const cssCode = sessions.css.getValue() ? `<style>${sessions.css.getValue()}</style>` : '';
     const jsCode = sessions.js.getValue() ? `<script>${sessions.js.getValue()}<\/script>` : '';
     const compiledParts = `${cssCode}\n${htmlCode}\n${jsCode}`;
     
@@ -458,22 +458,26 @@ document.addEventListener('touchmove', dragSearch, {passive: true});
 document.addEventListener('mouseup', endDragSearch);
 document.addEventListener('touchend', endDragSearch);
 
-function closeSearch() { panel.style.display = 'none'; editor.focus(); }
+function closeSearch() { 
+    panel.style.display = 'none'; 
+    editor.focus(); 
+}
 
+// تحديث البحث عند الكتابة
 document.getElementById('searchInput').oninput = function() {
-    document.getElementById('matchStatus').innerText = editor.findAll(this.value, { wrap: true }) + " matches";
+    updateMatchCount();
 };
 
+// فتح لوحة البحث وتحديث العداد فوراً
 document.getElementById('btnSearch').onclick = () => {
     panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
     if (panel.style.display === 'flex') {
         const input = document.getElementById('searchInput');
         input.focus();
-        
         let selectedText = editor.getSelectedText();
         if(selectedText) {
             input.value = selectedText;
-            document.getElementById('matchStatus').innerText = editor.findAll(selectedText, { wrap: true }) + " matches";
+            updateMatchCount();
         }
     }
 };
@@ -501,11 +505,16 @@ document.getElementById('btnClear').onclick = () => {
     updatePreview(); 
 };
 
-// RESIZER
+// RESIZER LOGIC
 const resizer = document.getElementById('resizer'), editorBox = document.getElementById('editorBox');
 let isResizing = false;
 
-const startResize = () => { isResizing = true; document.body.style.userSelect = 'none'; document.getElementById('previewBox').style.pointerEvents = 'none'; };
+const startResize = () => { 
+    isResizing = true; 
+    document.body.style.userSelect = 'none'; 
+    document.getElementById('previewBox').style.pointerEvents = 'none'; 
+};
+
 const doResize = (e) => {
     if (!isResizing) return;
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -520,7 +529,12 @@ const doResize = (e) => {
         if (p > 10 && p < 90) { editorBox.style.width = p + '%'; editor.resize(); }
     }
 };
-const endResize = () => { isResizing = false; document.body.style.userSelect = 'auto'; document.getElementById('previewBox').style.pointerEvents = 'auto'; };
+
+const endResize = () => { 
+    isResizing = false; 
+    document.body.style.userSelect = 'auto'; 
+    document.getElementById('previewBox').style.pointerEvents = 'auto'; 
+};
 
 resizer.addEventListener('mousedown', startResize);
 resizer.addEventListener('touchstart', startResize, {passive: true});
@@ -529,10 +543,9 @@ window.addEventListener('touchmove', doResize, {passive: true});
 window.addEventListener('mouseup', endResize);
 window.addEventListener('touchend', endResize);
 
-// SMART RESPONSIVE ZOOM FOR IFRAME (UPDATED FOR PERFECT CENTERING)
+// SMART RESPONSIVE ZOOM FOR IFRAME
 function applyResponsiveZoom() {
     const doc = previewFrame.contentDocument; if (!doc?.body) return;
-    
     doc.body.style.zoom = '1';
     
     let isMobile = previewFrame.classList.contains('mobile');
@@ -556,7 +569,49 @@ function applyResponsiveZoom() {
          previewFrame.style.transform = 'none';
     }
 }
+
 new ResizeObserver(() => applyResponsiveZoom()).observe(document.getElementById('previewBox'));
+
+// دالة تحديث عداد البحث المتقدمة (X of Y) - النسخة الموثوقة
+function updateMatchCount() {
+    const searchInput = document.getElementById('searchInput').value;
+    const status = document.getElementById('matchStatus');
+    
+    if (!searchInput) {
+        status.innerText = "0 matches";
+        return;
+    }
+
+    // تهيئة محرك البحث لضمان أحدث داتا
+    editor.$search.setOptions({
+        needle: searchInput,
+        caseSensitive: false,
+        wholeWord: false,
+        regExp: false
+    });
+
+    // جلب كل النتائج
+    const allMatches = editor.$search.findAll(editor.session);
+    const total = allMatches.length;
+    
+    // تحديد مكان النتيجة الحالية
+    const cursor = editor.getCursorPosition();
+    let current = 0;
+    
+    if (total > 0) {
+        // نوجد أول نتيجة تبدأ بعد أو عند مكان الكرسور الحالي
+        current = allMatches.findIndex(range => {
+            return range.start.row > cursor.row || 
+                   (range.start.row === cursor.row && range.start.column >= cursor.column);
+        });
+        
+        // لو ملقاش حاجة يبقى إحنا في آخر واحدة
+        if (current === -1) current = total;
+        else current = current + 1;
+    }
+
+    status.innerText = (total > 0) ? `${current} of ${total}` : "0 matches";
+}
 </script>
 </body>
 </html>

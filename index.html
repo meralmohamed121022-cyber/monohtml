@@ -8,9 +8,11 @@
 <link rel="icon" type="image/png" href="https://github.com/meralmohamed121022-cyber/Drug-Monograph/blob/main/6_20251129_184528_0005.png?raw=true">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ext-language_tools.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.9/beautify-html.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.3/ace.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.3/ext-language_tools.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.4/beautify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.4/beautify-css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.4/beautify-html.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -20,135 +22,400 @@ body { margin: 0; display: flex; flex-direction: column; height: 100vh; font-fam
 body.dark-mode { background-color: #0d1117; color: #c9d1d9; }
 body.light-mode { background-color: #f6f8fa; color: #24292e; }
 
-/* Navigation Bar */
-.topbar { width: 100%; padding: 12px 15px; display: flex; flex-direction: row; align-items: center; gap: 10px; transition: 0.3s; z-index: 10; box-sizing: border-box; flex-wrap: wrap; }
-body.dark-mode .topbar { background-color: #161b22; border-bottom: 2px solid #003366; }
-body.light-mode .topbar { background-color: #ffffff; border-bottom: 2px solid #003366; }
-.topbar h2 { margin: 0 15px 0 0; font-size: 16px; color: #ff8c00; font-weight: bold; }
+/* Navigation Bar (Dynamic for Collapsing) */
+.topbar { 
+    width: 100%; padding: 12px 15px; display: flex; flex-direction: row; align-items: flex-start; 
+    gap: 15px; transition: all 0.3s ease-in-out; z-index: 10; box-sizing: border-box; 
+    border-bottom: 2px solid #003366; flex-shrink: 0;
+}
+body.dark-mode .topbar { background-color: #161b22; }
+body.light-mode .topbar { background-color: #ffffff; }
 
-/* Contact Section */
-.contact-section { display: flex; align-items: center; gap: 10px; margin-left: auto; padding-right: 10px; }
-.mo-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #ff8c00; box-shadow: 2px 2px 0px #003366; object-fit: cover; }
-.social-icons { display: flex; gap: 8px; }
-.social-icons a { text-decoration: none; color: #ffffff; background: #003366; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px; border: 1.5px solid #003366; box-shadow: 2px 2px 0px #ff8c00; transition: 0.2s; }
-.social-icons a:hover { transform: translateY(-2px); background: #ff8c00; border-color: #ff8c00; box-shadow: 2px 2px 0px #003366; }
+/* When collapsed, shrink padding to give more space to main-area */
+.topbar.collapsed { padding: 6px 15px; border-bottom: 1px solid rgba(0,51,102,0.3); }
 
-/* Device Selector */
-.device-selector { display: flex; gap: 5px; background: rgba(0, 51, 102, 0.1); padding: 5px; border-radius: 20px; border: 1px solid #003366; }
-.device-btn { background: none !important; border: none !important; box-shadow: none !important; color: #003366 !important; font-size: 16px !important; padding: 5px 10px !important; border-radius: 15px !important; cursor: pointer; transition: 0.3s; }
+/* Brand Section (Title + Contact) */
+.brand-section { display: flex; flex-direction: column; gap: 8px; border-right: 2px dashed rgba(0, 51, 102, 0.2); padding-right: 15px; transition: 0.3s; }
+body.dark-mode .brand-section { border-right: 2px dashed rgba(255, 255, 255, 0.1); }
+.topbar.collapsed .brand-section { border-right: none; flex-direction: row; align-items: center; }
+
+.title-container { display: flex; align-items: center; gap: 10px; }
+
+/* Modern Interactive Title */
+.modern-title { 
+    margin: 0; font-size: 22px; font-weight: 900; 
+    background: linear-gradient(45deg, #ff8c00, #ff3b00); 
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+    text-transform: uppercase; letter-spacing: 1.5px; 
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1); transition: 0.3s;
+}
+.modern-title:hover { transform: scale(1.02); filter: drop-shadow(0 0 5px rgba(255, 140, 0, 0.5)); }
+
+/* Collapse Button */
+.collapse-btn { 
+    background: #003366; color: #ffffff; border: none; border-radius: 50%; 
+    width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; 
+    box-shadow: 2px 2px 0px #ff8c00; transition: 0.2s; font-size: 12px; 
+}
+.collapse-btn:hover { background: #ff8c00; box-shadow: 2px 2px 0px #003366; transform: translateY(-2px); }
+.collapse-btn:active { transform: translate(1px, 1px); box-shadow: 0 0 0 #003366; }
+
+/* Contact & Avatar */
+.contact-section { display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+.topbar.collapsed .contact-section { margin-left: 15px; } /* Adjust when horizontal */
+.mo-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #ff8c00; box-shadow: 2px 2px 0px #003366; object-fit: cover; }
+.social-icons { display: flex; gap: 6px; }
+.social-icons a { text-decoration: none; color: #ffffff; background: #003366; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; border: 1.5px solid #003366; box-shadow: 2px 2px 0px #ff8c00; transition: 0.2s; }
+.social-icons a:hover { transform: translateY(-2px); background: #ff8c00; box-shadow: 2px 2px 0px #003366; border-color: #ff8c00; }
+
+/* Toolbar Content (Collapsible) */
+.toolbar-content { display: flex; flex: 1; flex-wrap: wrap; gap: 10px; align-items: center; transition: max-height 0.3s ease-out, opacity 0.2s; overflow: hidden; }
+.topbar.collapsed .toolbar-content { display: none; opacity: 0; }
+
+/* Tools & Devices Groups */
+.tool-group { display: flex; gap: 5px; border-right: 2px solid rgba(0, 51, 102, 0.2); padding-right: 10px; align-items: center; }
+body.dark-mode .tool-group { border-right: 2px solid rgba(255, 255, 255, 0.1); }
+.tool-group:last-child { border-right: none; }
+
+/* Responsive Device Selectors */
+.device-selector { display: flex; gap: 2px; background: rgba(0, 51, 102, 0.1); padding: 4px; border-radius: 20px; border: 1px solid #003366; }
+.device-btn { background: none !important; border: none !important; box-shadow: none !important; color: #003366 !important; font-size: 15px !important; padding: 4px 8px !important; border-radius: 15px !important; cursor: pointer; transition: 0.3s; }
 .device-btn.active { background-color: #ff8c00 !important; color: white !important; }
 body.dark-mode .device-btn { color: #c9d1d9 !important; }
 
 /* 3D Action Buttons */
-.topbar button, .file-upload-label { padding: 8px 14px; cursor: pointer; text-align: center; font-size: 13px; border-radius: 25px; font-weight: bold; transition: all 0.2s ease; white-space: nowrap; display: flex; align-items: center; gap: 5px; background-color: #003366; color: #ffffff; border: 2px solid #003366; box-shadow: 4px 4px 0px #ff8c00; }
-.topbar button:hover, .file-upload-label:hover { background-color: #ff8c00; box-shadow: 4px 4px 0px #003366; transform: translateY(-2px); }
-.topbar button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #003366; }
+.tool-group button, .file-upload-label { padding: 6px 12px; cursor: pointer; text-align: center; font-size: 12px; border-radius: 20px; font-weight: bold; transition: all 0.2s ease; white-space: nowrap; display: flex; align-items: center; gap: 5px; background-color: #003366; color: #ffffff; border: 2px solid #003366; box-shadow: 3px 3px 0px #ff8c00; }
+.tool-group button:hover, .file-upload-label:hover { background-color: #ff8c00; box-shadow: 3px 3px 0px #003366; transform: translateY(-2px); border-color: #ff8c00; }
+.tool-group button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #003366; }
 
-/* Editor & Preview */
+/* Main Area */
 .main-area { display: flex; flex: 1; width: 100%; overflow: hidden; position: relative; }
-.editor-box { width: 50%; height: 100%; display: flex; flex-direction: column; position: relative; }
-.preview-box { flex: 1; height: 100%; display: flex; flex-direction: column; background: #e0e0e0; overflow: auto; align-items: center; padding-top: 20px; transition: 0.3s; }
-#previewFrame { width: 100%; height: 100%; border: none; background-color: #ffffff; transition: 0.4s; box-shadow: 0 0 20px rgba(0,0,0,0.2); }
-#previewFrame.mobile { width: 375px; height: 667px; border: 12px solid #333; border-radius: 30px; }
-#previewFrame.tablet { width: 768px; height: 1024px; border: 15px solid #333; border-radius: 20px; }
 
-.resizer { width: 6px; background-color: #ff8c00; cursor: col-resize; z-index: 500; transition: 0.2s; border-left: 1px solid #003366; border-right: 1px solid #003366;}
+/* Code Tabs */
+.editor-box { width: 50%; height: 100%; display: flex; flex-direction: column; position: relative; background: #ffffff; }
+body.dark-mode .editor-box { background: #0d1117; }
+
+.editor-tabs { display: flex; background: #003366; }
+body.dark-mode .editor-tabs { background: #161b22; border-bottom: 2px solid #ff8c00; }
+.tab-btn { flex: 1; padding: 8px; background: transparent; border: none; color: #a9b7c6; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.1); }
+.tab-btn:last-child { border-right: none; }
+.tab-btn:hover { color: #ffffff; background: rgba(255, 140, 0, 0.2); }
+.tab-btn.active { background: #ff8c00; color: #ffffff; }
+
+/* Ace Editor Container */
 #htmlInput { flex: 1; width: 100%; height: 100%; font-size: 15px; }
 
+/* ==========================================================
+   CUSTOM SYNTAX COLORS EXACTLY AS REQUESTED (Based on Image)
+   ========================================================== */
+/* Light Mode (Classic TextMate style matching the image) */
+.ace_editor { background-color: #ffffff !important; color: #000000 !important; }
+.ace_editor .ace_keyword { color: #0000FF !important; } /* Blue keywords */
+.ace_editor .ace_xml.ace_tag { color: #800080 !important; font-weight: bold; } /* Purple tags like div, html */
+.ace_editor .ace_attribute-name { color: #FF0000 !important; } /* Red attributes like class, id */
+.ace_editor .ace_string { color: #0000FF !important; } /* Blue strings like "container" */
+.ace_editor .ace_comment { color: #008000 !important; font-style: italic; } /* Green comments */
+
+/* Dark Mode (Matching the specific prompt request: Blue tags, Red Strings) */
+.ace_dark.ace_editor { background-color: #1e1e1e !important; color: #d4d4d4 !important; }
+.ace_dark.ace_editor .ace_gutter { background-color: #1e1e1e !important; color: #858585 !important; border-right: 1px solid #333; }
+.ace_dark.ace_editor .ace_keyword, 
+.ace_dark.ace_editor .ace_meta.ace_tag,
+.ace_dark.ace_editor .ace_xml.ace_tag { color: #569cd6 !important; font-weight: bold; } /* Blue Tags */
+.ace_dark.ace_editor .ace_attribute-name { color: #9cdcfe !important; } /* Light Blue Attributes */
+.ace_dark.ace_editor .ace_string { color: #ce9178 !important; } /* Red/Orange Strings */
+.ace_dark.ace_editor .ace_comment { color: #6A9955 !important; font-style: italic; }
+
+/* Preview Box */
+.preview-box { 
+    flex: 1; height: 100%; display: flex; flex-direction: column; background: #e0e0e0; 
+    overflow: auto; align-items: center; justify-content: flex-start; 
+    padding: 20px; transition: 0.3s; box-sizing: border-box;
+}
+body.dark-mode .preview-box { background: #090c10; }
+#previewFrame { 
+    width: 100%; height: 100%; border: none; background-color: #ffffff; 
+    transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.4s; 
+    box-shadow: 0 0 20px rgba(0,0,0,0.2); 
+    transform-origin: top center;
+}
+#previewFrame.mobile { width: 375px !important; height: 667px !important; flex: none; border: 12px solid #333; border-radius: 30px; margin: 0 auto; }
+#previewFrame.tablet { width: 768px !important; height: 1024px !important; flex: none; border: 15px solid #333; border-radius: 20px; margin: 0 auto; }
+
+/* Horizontal Layout Classes */
+.main-area.horizontal-layout { flex-direction: column; }
+.main-area.horizontal-layout .editor-box { width: 100% !important; height: 50%; order: 3; }
+.main-area.horizontal-layout .preview-box { width: 100% !important; height: 50%; order: 1; }
+.main-area.horizontal-layout .resizer { width: 100% !important; height: 8px; cursor: row-resize; border-left: none; border-right: none; border-top: 2px solid #003366; border-bottom: 2px solid #003366; order: 2; }
+
+/* Resizer */
+.resizer { width: 6px; background-color: #ff8c00; cursor: col-resize; z-index: 500; transition: 0.2s; border-left: 1px solid #003366; border-right: 1px solid #003366; touch-action: none; }
+
 /* Draggable Search Panel */
-.search-panel { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; padding: 15px; border-radius: 25px; width: 300px; display: none; flex-direction: column; gap: 10px; border: 3px solid #003366; box-shadow: 6px 6px 0px #ff8c00; background: #ffffff; }
+.search-panel { 
+    position: absolute; top: 50px; left: 50%; transform: translateX(-50%); z-index: 2000; 
+    padding: 15px; border-radius: 25px; width: 300px; display: none; flex-direction: column; gap: 10px; 
+    border: 3px solid #003366; box-shadow: 6px 6px 0px #ff8c00; background: #ffffff; touch-action: none; 
+}
 body.dark-mode .search-panel { background: #161b22; }
 
-/* Custom Syntax Color For Dark Mode */
-.ace_dark.ace_editor .ace_keyword, .ace_dark.ace_editor .ace_xml.ace_tag { color: #ff7b72 !important; } /* Red */
-.ace_dark.ace_editor .ace_attribute-name { color: #0066cc !important; font-weight: bold; } /* Dark Blue */
-.ace_dark.ace_editor .ace_string { color: #a6e22e !important; }
+/* Gray Placeholder & Input Text for Search */
+.search-inputs input::placeholder { color: #888888; opacity: 1; }
+body.dark-mode .search-inputs input::placeholder { color: #aaaaaa; }
 </style>
 </head>
 <body class="light-mode">
 
-<div class="topbar">
-    <h2>MONO-HTML-SHOW</h2>
-    <button id="btnNewTab">🌐 New Tab</button>
-    <button id="btnTheme">🌙/☀️ Theme</button>
-    <div class="device-selector">
-        <button class="device-btn active" onclick="setViewport('laptop', this)"><i class="fas fa-laptop"></i></button>
-        <button class="device-btn" onclick="setViewport('tablet', this)"><i class="fas fa-tablet-alt"></i></button>
-        <button class="device-btn" onclick="setViewport('mobile', this)"><i class="fas fa-mobile-alt"></i></button>
+<div class="topbar" id="topbar">
+    <div class="brand-section">
+        <div class="title-container">
+            <h2 class="modern-title">MONO-HTML</h2>
+            <button class="collapse-btn" onclick="toggleToolbar()" title="Toggle Toolbar">
+                <i class="fas fa-chevron-up" id="collapseIcon"></i>
+            </button>
+        </div>
+        <div class="contact-section">
+            <img src="https://github.com/meralmohamed121022-cyber/Drug-Monograph/blob/main/6_20251129_184528_0005.png?raw=true" alt="Mo" class="mo-avatar">
+            <div class="social-icons">
+                <a href="https://wa.me/966541932559" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://facebook.com/mohamed.kholeif.92" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            </div>
+        </div>
     </div>
-    <button onclick="formatCode()">✨ Format</button>
-    
-    <button onclick="document.getElementById('fileInput').click()">📁 Import</button>
-    <input type="file" id="fileInput" accept=".html,.json,.txt" style="display:none">
 
-    <button id="btnSearch">🔍 Search</button>
-    <button id="btnExportHtml">📄 HTML</button>
-    <button id="btnExportJson">📦 JSON</button>
-    <button id="btnExportImg">🖼️ PHOTO</button>
-    <button id="btnExportPdf">📑 PDF</button>
-    <button id="btnClear">🗑️ Clear</button>
+    <div class="toolbar-content" id="toolbarContent">
+        <div class="tool-group">
+            <button id="btnLayout" onclick="toggleLayout()"><i class="fas fa-layer-group"></i> Horizontal</button>
+            <button id="btnTheme"><i class="fas fa-moon"></i> Theme</button>
+            <div class="device-selector">
+                <button class="device-btn active" onclick="setViewport('laptop', this)"><i class="fas fa-laptop"></i></button>
+                <button class="device-btn" onclick="setViewport('tablet', this)"><i class="fas fa-tablet-alt"></i></button>
+                <button class="device-btn" onclick="setViewport('mobile', this)"><i class="fas fa-mobile-alt"></i></button>
+            </div>
+        </div>
 
-    <div class="contact-section">
-        <img src="https://github.com/meralmohamed121022-cyber/Drug-Monograph/blob/main/6_20251129_184528_0005.png?raw=true" alt="Mo" class="mo-avatar">
-        <div class="social-icons">
-            <a href="https://wa.me/966541932559" target="_blank"><i class="fab fa-whatsapp"></i></a>
-            <a href="https://facebook.com/mohamed.kholeif.92" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        <div class="tool-group">
+            <button onclick="formatCode()"><i class="fas fa-magic"></i> Format</button>
+            <label class="file-upload-label"><i class="fas fa-folder-open"></i> Import<input type="file" id="fileInput" accept=".html,.json,.txt,.css,.js" style="display:none"></label>
+            <button id="btnSearch"><i class="fas fa-search"></i> Search</button>
+            <button id="btnClear"><i class="fas fa-trash"></i> Clear</button>
+        </div>
+
+        <div class="tool-group" style="border: none;">
+            <button id="btnNewTab"><i class="fas fa-external-link-alt"></i> Full</button>
+            <button id="btnExportHtml">📄 HTML</button>
+            <button id="btnExportJson">📦 JSON</button>
+            <button id="btnExportImg">🖼️ IMG</button>
+            <button id="btnExportPdf">📑 PDF</button>
         </div>
     </div>
 </div>
 
 <div class="main-area">
     <div class="editor-box" id="editorBox">
+        <div class="editor-tabs">
+            <button class="tab-btn active" onclick="switchTab('all', this)"><i class="fa-solid fa-layer-group"></i> All Code</button>
+            <button class="tab-btn" onclick="switchTab('html', this)"><i class="fab fa-html5"></i> HTML</button>
+            <button class="tab-btn" onclick="switchTab('css', this)"><i class="fab fa-css3-alt"></i> CSS</button>
+            <button class="tab-btn" onclick="switchTab('js', this)"><i class="fab fa-js"></i> JS</button>
+        </div>
+
         <div id="searchPanel" class="search-panel">
             <div id="searchHeader" style="display:flex; justify-content:space-between; cursor:move; color:#ff8c00; font-weight:bold; border-bottom:2px solid #003366; padding-bottom:5px;">
                 <span>✥ DRAG SEARCH</span>
                 <span onclick="closeSearch()" style="cursor:pointer">✖</span>
             </div>
-            <div style="display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:20px; border:2px solid #003366; background:#f0f4f8; margin-top:10px;">
-                <input type="text" id="searchInput" placeholder="Find...">
+            <div class="search-inputs" style="display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:20px; border:2px solid #003366; background:#f0f4f8; margin-top:10px;">
+                <input type="text" id="searchInput" placeholder="Search for..." style="border:none; background:transparent; outline:none; flex:1; font-weight:bold; color:#555;">
                 <span id="matchStatus" style="font-size:11px; font-weight:bold; color:#ff8c00;">0 matches</span>
             </div>
-            <input type="text" id="replaceInput" placeholder="Replace..." style="padding:8px 12px; border-radius:20px; border:2px solid #003366; background:#f0f4f8; font-weight:bold; color:#003366; outline:none;">
+            <div class="search-inputs" style="display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:20px; border:2px solid #003366; background:#f0f4f8;">
+                <input type="text" id="replaceInput" placeholder="Replace with..." style="border:none; background:transparent; outline:none; flex:1; font-weight:bold; color:#555;">
+            </div>
             <div style="display:flex; gap:6px;">
                 <button onclick="editor.findPrevious()" style="flex:0.3; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">▲</button>
                 <button onclick="editor.findNext()" style="flex:0.3; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">▼</button>
                 <button onclick="editor.replace(document.getElementById('replaceInput').value)" style="flex:1; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">Replace</button>
+                <button onclick="editor.replaceAll(document.getElementById('replaceInput').value)" style="flex:1; background:#003366; color:white; border-radius:15px; border:none; padding:8px; cursor:pointer">All</button>
             </div>
         </div>
+        
         <div id="htmlInput"></div>
     </div>
+    
     <div class="resizer" id="resizer"></div>
-    <div class="preview-box" id="previewBox"><iframe id="previewFrame"></iframe></div>
+    
+    <div class="preview-box" id="previewBox">
+        <iframe id="previewFrame"></iframe>
+    </div>
 </div>
 
 <script>
-// Initializing Ace
+// ==============================================================
+// TOPBAR COLLAPSE LOGIC
+// ==============================================================
+function toggleToolbar() {
+    const topbar = document.getElementById('topbar');
+    const icon = document.getElementById('collapseIcon');
+    
+    topbar.classList.toggle('collapsed');
+    
+    if (topbar.classList.contains('collapsed')) {
+        icon.className = 'fas fa-chevron-down';
+    } else {
+        icon.className = 'fas fa-chevron-up';
+    }
+    
+    setTimeout(() => {
+        editor.resize();
+        applyResponsiveZoom();
+    }, 300);
+}
+
+// ==============================================================
+// ACE EDITOR & SESSIONS TABS LOGIC
+// ==============================================================
+ace.require("ace/ext/language_tools");
 const editor = ace.edit("htmlInput");
 editor.setTheme("ace/theme/textmate");
-editor.session.setMode("ace/mode/html");
 editor.setOptions({ fontSize: "15px", wrap: true, useWorker: false });
 
+// Hijack Default Browser Search (Ctrl+F or Cmd+F)
+editor.commands.addCommand({
+    name: "find",
+    bindKey: {win: "Ctrl-F", mac: "Command-F"},
+    exec: function(editor) {
+        document.getElementById('btnSearch').click();
+    }
+});
+
+const sessions = {
+    all: ace.createEditSession("", "ace/mode/html"),
+    html: ace.createEditSession("", "ace/mode/html"),
+    css: ace.createEditSession("", "ace/mode/css"),
+    js: ace.createEditSession("", "ace/mode/javascript")
+};
+
+let currentTab = 'all';
+editor.setSession(sessions.all);
+
+function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTab = tabId;
+    editor.setSession(sessions[tabId]);
+    editor.focus();
+}
+
+// ==============================================================
+// PREVIEW COMPILATION LOGIC
+// ==============================================================
 const previewFrame = document.getElementById('previewFrame');
+
+function getCompiledCode() {
+    const htmlCode = sessions.html.getValue();
+    const cssCode = sessions.css.getValue() ? `<style>${sessions.css.getValue()}</style>` : '';
+    const jsCode = sessions.js.getValue() ? `<script>${sessions.js.getValue()}<\/script>` : '';
+    const compiledParts = `${cssCode}\n${htmlCode}\n${jsCode}`;
+    
+    const allCode = sessions.all.getValue();
+    
+    if (htmlCode || sessions.css.getValue() || sessions.js.getValue()) {
+        return compiledParts;
+    } else {
+        return allCode;
+    }
+}
+
 const updatePreview = () => { 
-    previewFrame.srcdoc = editor.getValue(); 
+    previewFrame.srcdoc = getCompiledCode(); 
     previewFrame.onload = () => applyResponsiveZoom();
 };
-editor.session.on('change', updatePreview);
 
-// Import Logic - تم الإصلاح هنا
+Object.values(sessions).forEach(session => {
+    session.on('change', updatePreview);
+});
+
+// ==============================================================
+// LAYOUT TOGGLE (HORIZONTAL / VERTICAL)
+// ==============================================================
+let isHorizontal = false;
+function toggleLayout() {
+    isHorizontal = !isHorizontal;
+    const mainArea = document.querySelector('.main-area');
+    const editorBox = document.getElementById('editorBox');
+    const btn = document.getElementById('btnLayout');
+    
+    if (isHorizontal) {
+        mainArea.classList.add('horizontal-layout');
+        editorBox.style.width = '100%';
+        editorBox.style.height = '50%';
+        btn.innerHTML = '<i class="fas fa-columns"></i> Vertical';
+    } else {
+        mainArea.classList.remove('horizontal-layout');
+        editorBox.style.height = '100%';
+        editorBox.style.width = '50%';
+        btn.innerHTML = '<i class="fas fa-layer-group"></i> Horizontal';
+    }
+    editor.resize();
+    applyResponsiveZoom();
+}
+
+// ==============================================================
+// FILE IMPORT & TITLE EXTRACTION
+// ==============================================================
 document.getElementById('fileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = function(ev) {
-        editor.setValue(ev.target.result, -1);
+        let code = ev.target.result;
+        sessions.all.setValue(code);
+        
+        let cssMatch = code.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
+        let jsMatch = code.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
+        let extractedCss = "", extractedJs = "", extractedHtml = code;
+
+        if (cssMatch) {
+            cssMatch.forEach(block => {
+                let inner = block.replace(/<style[^>]*>/i, "").replace(/<\/style>/i, "");
+                extractedCss += inner + "\n";
+                extractedHtml = extractedHtml.replace(block, ""); 
+            });
+            sessions.css.setValue(extractedCss.trim());
+        } else {
+            sessions.css.setValue("");
+        }
+
+        if (jsMatch) {
+            jsMatch.forEach(block => {
+                if(!block.includes("src=")) {
+                    let inner = block.replace(/<script[^>]*>/i, "").replace(/<\/script>/i, "");
+                    extractedJs += inner + "\n";
+                    extractedHtml = extractedHtml.replace(block, ""); 
+                }
+            });
+            sessions.js.setValue(extractedJs.trim());
+        } else {
+            sessions.js.setValue("");
+        }
+        
+        if(cssMatch || jsMatch) {
+             sessions.html.setValue(extractedHtml.trim());
+             switchTab('html', document.querySelectorAll('.tab-btn')[1]);
+        } else {
+             sessions.html.setValue("");
+             switchTab('all', document.querySelectorAll('.tab-btn')[0]);
+        }
+
         updatePreview();
     };
     reader.readAsText(file);
+    this.value = ''; 
 });
 
 function getDocTitle() {
-    const match = editor.getValue().match(/<title>(.*?)<\/title>/i);
+    const match = getCompiledCode().match(/<title>(.*?)<\/title>/i);
     return (match && match[1]) ? match[1].trim().replace(/[/\\?%*:|"<>]/g, '-') : 'document';
 }
 
@@ -156,58 +423,87 @@ function setViewport(device, btn) {
     document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     previewFrame.className = device === 'laptop' ? '' : device;
+    setTimeout(applyResponsiveZoom, 50);
 }
 
-// Exports
+// ==============================================================
+// EXPORT FUNCTIONS
+// ==============================================================
 document.getElementById('btnExportHtml').onclick = () => {
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(new Blob([editor.getValue()], {type:'text/html'}));
+    link.href = URL.createObjectURL(new Blob([getCompiledCode()], {type:'text/html'}));
     link.download = getDocTitle() + '.html';
     link.click();
 };
 
 document.getElementById('btnExportJson').onclick = () => {
+    const data = { 
+        title: getDocTitle(), 
+        all: sessions.all.getValue(), 
+        html: sessions.html.getValue(), 
+        css: sessions.css.getValue(), 
+        js: sessions.js.getValue() 
+    };
     const link = document.createElement('a');
-    const data = { title: getDocTitle(), code: editor.getValue() };
     link.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 4)], {type:'application/json'}));
     link.download = getDocTitle() + '.json';
     link.click();
 };
 
 document.getElementById('btnExportImg').onclick = () => {
-    const el = previewFrame.contentDocument.body;
-    el.style.zoom = "1";
+    const el = previewFrame.contentDocument.body; el.style.zoom = "1";
     html2canvas(el, { useCORS: true, scale: 2 }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = getDocTitle() + '.png';
-        link.href = canvas.toDataURL();
-        link.click();
-        applyResponsiveZoom();
+        const link = document.createElement('a'); link.download = getDocTitle() + '.png';
+        link.href = canvas.toDataURL(); link.click(); applyResponsiveZoom();
     });
 };
 
 document.getElementById('btnExportPdf').onclick = () => {
-    const el = previewFrame.contentDocument.body;
-    el.style.zoom = "1";
-    if (!el.style.backgroundColor || el.style.backgroundColor === 'transparent') el.style.backgroundColor = '#ffffff';
+    const el = previewFrame.contentDocument.body; el.style.zoom = "1";
+    let oldBg = el.style.backgroundColor; if (!oldBg || oldBg === 'transparent') el.style.backgroundColor = '#ffffff';
     html2canvas(el, { useCORS: true, scale: 2 }).then(canvas => {
         const imgW = 210, pdfH = Math.max(297, (canvas.height * imgW) / canvas.width);
-        html2pdf().set({ margin: 0, filename: getDocTitle() + '.pdf', jsPDF: { unit: 'mm', format: [imgW, pdfH] } }).from(canvas).save().then(() => applyResponsiveZoom());
+        html2pdf().set({ margin: 0, filename: getDocTitle() + '.pdf', jsPDF: { unit: 'mm', format: [imgW, pdfH] } }).from(canvas).save().then(() => {
+            el.style.backgroundColor = oldBg; applyResponsiveZoom();
+        });
     });
 };
 
 document.getElementById('btnNewTab').onclick = () => {
     const win = window.open();
-    win.document.write(editor.getValue());
+    win.document.write(getCompiledCode());
     win.document.close();
 };
 
-// Search Drag
+// ==============================================================
+// DRAGGABLE SEARCH PANEL
+// ==============================================================
 const panel = document.getElementById("searchPanel"), header = document.getElementById("searchHeader");
-let isDragging = false, offset = [0, 0];
-header.onmousedown = (e) => { isDragging = true; offset = [panel.offsetLeft - e.clientX, panel.offsetTop - e.clientY]; };
-document.onmousemove = (e) => { if (isDragging) { panel.style.left = (e.clientX + offset[0]) + "px"; panel.style.top = (e.clientY + offset[1]) + "px"; panel.style.transform = "none"; } };
-document.onmouseup = () => isDragging = false;
+let isDraggingSearch = false, searchOffset = [0, 0];
+
+const startDragSearch = (e) => {
+    isDraggingSearch = true;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    searchOffset = [panel.offsetLeft - clientX, panel.offsetTop - clientY];
+};
+const dragSearch = (e) => {
+    if (!isDraggingSearch) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    panel.style.left = (clientX + searchOffset[0]) + "px";
+    panel.style.top = (clientY + searchOffset[1]) + "px";
+    panel.style.transform = "none";
+};
+const endDragSearch = () => { isDraggingSearch = false; };
+
+header.addEventListener('mousedown', startDragSearch);
+header.addEventListener('touchstart', startDragSearch, {passive: true});
+document.addEventListener('mousemove', dragSearch);
+document.addEventListener('touchmove', dragSearch, {passive: true});
+document.addEventListener('mouseup', endDragSearch);
+document.addEventListener('touchend', endDragSearch);
+
 function closeSearch() { panel.style.display = 'none'; editor.focus(); }
 
 document.getElementById('searchInput').oninput = function() {
@@ -216,23 +512,106 @@ document.getElementById('searchInput').oninput = function() {
 
 document.getElementById('btnSearch').onclick = () => {
     panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
-    if (panel.style.display === 'flex') document.getElementById('searchInput').focus();
+    if (panel.style.display === 'flex') {
+        const input = document.getElementById('searchInput');
+        input.focus();
+        
+        let selectedText = editor.getSelectedText();
+        if(selectedText) {
+            input.value = selectedText;
+            document.getElementById('matchStatus').innerText = editor.findAll(selectedText, { wrap: true }) + " matches";
+        }
+    }
 };
 
 document.getElementById('btnTheme').onclick = () => {
     const isDark = document.body.classList.toggle('dark-mode');
     document.body.classList.toggle('light-mode', !isDark);
+    
+    // Switch between the custom styled monokai and textmate
     editor.setTheme(isDark ? "ace/theme/monokai" : "ace/theme/textmate");
 };
 
-function formatCode() { editor.setValue(html_beautify(editor.getValue(), { indent_size: 4 }), -1); }
-document.getElementById('btnClear').onclick = () => { editor.setValue(''); updatePreview(); };
+function formatCode() { 
+    let val = editor.getValue();
+    let mode = editor.session.getMode().$id;
+    if (mode === "ace/mode/javascript") {
+        editor.setValue(js_beautify(val, { indent_size: 4 }), -1);
+    } else if (mode === "ace/mode/css") {
+        editor.setValue(css_beautify(val, { indent_size: 4 }), -1);
+    } else {
+        editor.setValue(html_beautify(val, { indent_size: 4 }), -1);
+    }
+}
 
+document.getElementById('btnClear').onclick = () => { 
+    Object.values(sessions).forEach(s => s.setValue("")); 
+    updatePreview(); 
+};
+
+// ==============================================================
+// RESIZER (Supports Horizontal & Vertical)
+// ==============================================================
+const resizer = document.getElementById('resizer'), editorBox = document.getElementById('editorBox');
+let isResizing = false;
+
+const startResize = () => { isResizing = true; document.body.style.userSelect = 'none'; document.getElementById('previewBox').style.pointerEvents = 'none'; };
+const doResize = (e) => {
+    if (!isResizing) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    if (isHorizontal) {
+        let mainRect = document.querySelector('.main-area').getBoundingClientRect();
+        let p = ((mainRect.bottom - clientY) / mainRect.height) * 100;
+        if (p > 10 && p < 90) { editorBox.style.height = p + '%'; editor.resize(); }
+    } else {
+        let p = (clientX / window.innerWidth) * 100;
+        if (p > 10 && p < 90) { editorBox.style.width = p + '%'; editor.resize(); }
+    }
+};
+const endResize = () => { isResizing = false; document.body.style.userSelect = 'auto'; document.getElementById('previewBox').style.pointerEvents = 'auto'; };
+
+resizer.addEventListener('mousedown', startResize);
+resizer.addEventListener('touchstart', startResize, {passive: true});
+window.addEventListener('mousemove', doResize);
+window.addEventListener('touchmove', doResize, {passive: true});
+window.addEventListener('mouseup', endResize);
+window.addEventListener('touchend', endResize);
+
+// ==============================================================
+// SMART RESPONSIVE ZOOM FOR IFRAME
+// ==============================================================
 function applyResponsiveZoom() {
     const doc = previewFrame.contentDocument; if (!doc?.body) return;
+    
+    // Reset zoom and transforms to get base measurements
     doc.body.style.zoom = '1';
-    let cw = doc.documentElement.scrollWidth, vw = previewFrame.clientWidth;
-    if (cw > vw && vw > 0) doc.body.style.zoom = vw / cw;
+    previewFrame.style.transform = 'none';
+    
+    // Determine the fixed device width if selected, otherwise use container width
+    let targetWidth = previewFrame.classList.contains('mobile') ? 375 : 
+                      previewFrame.classList.contains('tablet') ? 768 : 
+                      previewFrame.clientWidth;
+
+    let containerWidth = document.getElementById('previewBox').clientWidth;
+    
+    // Calculate the scale needed to fit the iframe inside the preview box
+    // Allow a small padding (e.g. 40px)
+    let availableWidth = containerWidth - 40; 
+    
+    if (targetWidth > availableWidth && availableWidth > 0 && targetWidth > 0) {
+        let scaleRatio = availableWidth / targetWidth;
+        
+        // Scale the iframe element itself so the whole device mockup shrinks to fit
+        previewFrame.style.transform = `scale(${scaleRatio})`;
+        previewFrame.style.transformOrigin = 'top center';
+        
+        // Adjust the height of the wrapper so it doesn't leave extra empty space below the scaled iframe
+        // (Optional, but helps keep things tidy)
+    } else {
+         previewFrame.style.transform = 'none';
+    }
 }
 new ResizeObserver(() => applyResponsiveZoom()).observe(document.getElementById('previewBox'));
 </script>

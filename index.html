@@ -22,7 +22,7 @@ body { margin: 0; display: flex; flex-direction: column; height: 100vh; font-fam
 body.dark-mode { background-color: #0d1117; color: #c9d1d9; }
 body.light-mode { background-color: #f6f8fa; color: #24292e; }
 
-/* Navigation Bar (Dynamic for Collapsing) */
+/* Navigation Bar */
 .topbar { 
     width: 100%; padding: 12px 15px; display: flex; flex-direction: row; align-items: flex-start; 
     gap: 15px; transition: all 0.3s ease-in-out; z-index: 10; box-sizing: border-box; 
@@ -31,17 +31,15 @@ body.light-mode { background-color: #f6f8fa; color: #24292e; }
 body.dark-mode .topbar { background-color: #161b22; }
 body.light-mode .topbar { background-color: #ffffff; }
 
-/* When collapsed, shrink padding to give more space to main-area */
 .topbar.collapsed { padding: 6px 15px; border-bottom: 1px solid rgba(0,51,102,0.3); }
 
-/* Brand Section (Title + Contact) */
+/* Brand Section */
 .brand-section { display: flex; flex-direction: column; gap: 8px; border-right: 2px dashed rgba(0, 51, 102, 0.2); padding-right: 15px; transition: 0.3s; }
 body.dark-mode .brand-section { border-right: 2px dashed rgba(255, 255, 255, 0.1); }
 .topbar.collapsed .brand-section { border-right: none; flex-direction: row; align-items: center; }
 
 .title-container { display: flex; align-items: center; gap: 10px; }
 
-/* Modern Interactive Title */
 .modern-title { 
     margin: 0; font-size: 22px; font-weight: 900; 
     background: linear-gradient(45deg, #ff8c00, #ff3b00); 
@@ -51,117 +49,88 @@ body.dark-mode .brand-section { border-right: 2px dashed rgba(255, 255, 255, 0.1
 }
 .modern-title:hover { transform: scale(1.02); filter: drop-shadow(0 0 5px rgba(255, 140, 0, 0.5)); }
 
-/* Collapse Button */
 .collapse-btn { 
     background: #003366; color: #ffffff; border: none; border-radius: 50%; 
     width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; 
     box-shadow: 2px 2px 0px #ff8c00; transition: 0.2s; font-size: 12px; 
 }
-.collapse-btn:hover { background: #ff8c00; box-shadow: 2px 2px 0px #003366; transform: translateY(-2px); }
-.collapse-btn:active { transform: translate(1px, 1px); box-shadow: 0 0 0 #003366; }
 
-/* Contact & Avatar */
-.contact-section { display: flex; align-items: center; gap: 8px; transition: 0.3s; }
-.topbar.collapsed .contact-section { margin-left: 15px; } /* Adjust when horizontal */
+/* Avatar & Social */
 .mo-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #ff8c00; box-shadow: 2px 2px 0px #003366; object-fit: cover; }
 .social-icons { display: flex; gap: 6px; }
 .social-icons a { text-decoration: none; color: #ffffff; background: #003366; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; border: 1.5px solid #003366; box-shadow: 2px 2px 0px #ff8c00; transition: 0.2s; }
-.social-icons a:hover { transform: translateY(-2px); background: #ff8c00; box-shadow: 2px 2px 0px #003366; border-color: #ff8c00; }
 
-/* Toolbar Content (Collapsible) */
+/* Toolbar Content */
 .toolbar-content { display: flex; flex: 1; flex-wrap: wrap; gap: 10px; align-items: center; transition: max-height 0.3s ease-out, opacity 0.2s; overflow: hidden; }
 .topbar.collapsed .toolbar-content { display: none; opacity: 0; }
 
-/* Tools & Devices Groups */
 .tool-group { display: flex; gap: 5px; border-right: 2px solid rgba(0, 51, 102, 0.2); padding-right: 10px; align-items: center; }
-body.dark-mode .tool-group { border-right: 2px solid rgba(255, 255, 255, 0.1); }
 .tool-group:last-child { border-right: none; }
 
-/* Responsive Device Selectors */
 .device-selector { display: flex; gap: 2px; background: rgba(0, 51, 102, 0.1); padding: 4px; border-radius: 20px; border: 1px solid #003366; }
-.device-btn { background: none !important; border: none !important; box-shadow: none !important; color: #003366 !important; font-size: 15px !important; padding: 4px 8px !important; border-radius: 15px !important; cursor: pointer; transition: 0.3s; }
+.device-btn { background: none !important; border: none !important; box-shadow: none !important; color: #003366 !important; font-size: 15px !important; padding: 4px 8px !important; border-radius: 15px !important; cursor: pointer; }
 .device-btn.active { background-color: #ff8c00 !important; color: white !important; }
-body.dark-mode .device-btn { color: #c9d1d9 !important; }
 
-/* 3D Action Buttons */
 .tool-group button, .file-upload-label { padding: 6px 12px; cursor: pointer; text-align: center; font-size: 12px; border-radius: 20px; font-weight: bold; transition: all 0.2s ease; white-space: nowrap; display: flex; align-items: center; gap: 5px; background-color: #003366; color: #ffffff; border: 2px solid #003366; box-shadow: 3px 3px 0px #ff8c00; }
-.tool-group button:hover, .file-upload-label:hover { background-color: #ff8c00; box-shadow: 3px 3px 0px #003366; transform: translateY(-2px); border-color: #ff8c00; }
-.tool-group button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #003366; }
 
 /* Main Area */
 .main-area { display: flex; flex: 1; width: 100%; overflow: hidden; position: relative; }
 
-/* Code Tabs */
-.editor-box { width: 50%; height: 100%; display: flex; flex-direction: column; position: relative; background: #ffffff; }
-body.dark-mode .editor-box { background: #0d1117; }
+/* Code Box - Forced Light Theme */
+.editor-box { width: 50%; height: 100%; display: flex; flex-direction: column; position: relative; background: #ffffff !important; } 
+body.dark-mode .editor-box { background: #001122 !important; }
 
 .editor-tabs { display: flex; background: #003366; }
-body.dark-mode .editor-tabs { background: #161b22; border-bottom: 2px solid #ff8c00; }
-.tab-btn { flex: 1; padding: 8px; background: transparent; border: none; color: #a9b7c6; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.1); }
-.tab-btn:last-child { border-right: none; }
-.tab-btn:hover { color: #ffffff; background: rgba(255, 140, 0, 0.2); }
+.tab-btn { flex: 1; padding: 8px; background: transparent; border: none; color: #a9b7c6; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; }
 .tab-btn.active { background: #ff8c00; color: #ffffff; }
 
-/* Ace Editor Container */
 #htmlInput { flex: 1; width: 100%; height: 100%; font-size: 15px; }
 
-/* ==========================================================
-   CUSTOM SYNTAX COLORS EXACTLY AS REQUESTED (Based on Image)
-   ========================================================== */
-/* Light Mode (Classic TextMate style matching the image) */
+/* SYNTAX COLORS - White Background for Light Mode */
 .ace_editor { background-color: #ffffff !important; color: #000000 !important; }
-.ace_editor .ace_keyword { color: #0000FF !important; } /* Blue keywords */
-.ace_editor .ace_xml.ace_tag { color: #800080 !important; font-weight: bold; } /* Purple tags like div, html */
-.ace_editor .ace_attribute-name { color: #FF0000 !important; } /* Red attributes like class, id */
-.ace_editor .ace_string { color: #0000FF !important; } /* Blue strings like "container" */
-.ace_editor .ace_comment { color: #008000 !important; font-style: italic; } /* Green comments */
+.ace_gutter { background-color: #f0f0f0 !important; color: #333333 !important; border-right: 1px solid #cccccc !important; }
 
-/* Dark Mode (Matching the specific prompt request: Blue tags, Red Strings) */
-.ace_dark.ace_editor { background-color: #1e1e1e !important; color: #d4d4d4 !important; }
-.ace_dark.ace_editor .ace_gutter { background-color: #1e1e1e !important; color: #858585 !important; border-right: 1px solid #333; }
-.ace_dark.ace_editor .ace_keyword, 
-.ace_dark.ace_editor .ace_meta.ace_tag,
-.ace_dark.ace_editor .ace_xml.ace_tag { color: #569cd6 !important; font-weight: bold; } /* Blue Tags */
-.ace_dark.ace_editor .ace_attribute-name { color: #9cdcfe !important; } /* Light Blue Attributes */
-.ace_dark.ace_editor .ace_string { color: #ce9178 !important; } /* Red/Orange Strings */
-.ace_dark.ace_editor .ace_comment { color: #6A9955 !important; font-style: italic; }
+/* SYNTAX COLORS - Dark Mode Override */
+.ace_dark.ace_editor { background-color: #001122 !important; color: #d4d4d4 !important; }
+.ace_dark.ace_editor .ace_gutter { background-color: #001122 !important; color: #668099 !important; border-right: 1px solid #003366 !important; }
 
-/* Preview Box */
+/* Preview Box - Deep Blue Background Always */
 .preview-box { 
-    flex: 1; height: 100%; display: flex; flex-direction: column; background: #e0e0e0; 
-    overflow: auto; align-items: center; justify-content: flex-start; 
+    flex: 1; height: 100%; display: flex; flex-direction: column; 
+    background: #001f3f !important; /* Deep Blue behind Device */
+    overflow: hidden; align-items: center; justify-content: center; 
     padding: 20px; transition: 0.3s; box-sizing: border-box;
 }
-body.dark-mode .preview-box { background: #090c10; }
+
 #previewFrame { 
     width: 100%; height: 100%; border: none; background-color: #ffffff; 
-    transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.4s; 
-    box-shadow: 0 0 20px rgba(0,0,0,0.2); 
-    transform-origin: top center;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    box-shadow: 0 0 30px rgba(0,0,0,0.5); 
+    transform-origin: center center;
 }
-#previewFrame.mobile { width: 375px !important; height: 667px !important; flex: none; border: 12px solid #333; border-radius: 30px; margin: 0 auto; }
-#previewFrame.tablet { width: 768px !important; height: 1024px !important; flex: none; border: 15px solid #333; border-radius: 20px; margin: 0 auto; }
-
-/* Horizontal Layout Classes */
-.main-area.horizontal-layout { flex-direction: column; }
-.main-area.horizontal-layout .editor-box { width: 100% !important; height: 50%; order: 3; }
-.main-area.horizontal-layout .preview-box { width: 100% !important; height: 50%; order: 1; }
-.main-area.horizontal-layout .resizer { width: 100% !important; height: 8px; cursor: row-resize; border-left: none; border-right: none; border-top: 2px solid #003366; border-bottom: 2px solid #003366; order: 2; }
+#previewFrame.mobile { width: 375px !important; height: 667px !important; flex: none; border: 16px solid #1a1a1a; border-radius: 36px; margin: 0 auto; }
+#previewFrame.tablet { width: 768px !important; height: 1024px !important; flex: none; border: 16px solid #1a1a1a; border-radius: 24px; margin: 0 auto; }
 
 /* Resizer */
-.resizer { width: 6px; background-color: #ff8c00; cursor: col-resize; z-index: 500; transition: 0.2s; border-left: 1px solid #003366; border-right: 1px solid #003366; touch-action: none; }
+.resizer { width: 6px; background-color: #ff8c00; cursor: col-resize; z-index: 500; transition: 0.2s; border-left: 1px solid #003366; touch-action: none; }
 
-/* Draggable Search Panel */
+/* Search Panel */
 .search-panel { 
     position: absolute; top: 50px; left: 50%; transform: translateX(-50%); z-index: 2000; 
     padding: 15px; border-radius: 25px; width: 300px; display: none; flex-direction: column; gap: 10px; 
-    border: 3px solid #003366; box-shadow: 6px 6px 0px #ff8c00; background: #ffffff; touch-action: none; 
+    border: 3px solid #003366; box-shadow: 6px 6px 0px #ff8c00; background: #ffffff; 
 }
-body.dark-mode .search-panel { background: #161b22; }
 
-/* Gray Placeholder & Input Text for Search */
-.search-inputs input::placeholder { color: #888888; opacity: 1; }
-body.dark-mode .search-inputs input::placeholder { color: #aaaaaa; }
+/* MOBILE RESPONSIVE MEDIA QUERIES */
+@media (max-width: 768px) {
+    .topbar { flex-direction: column; padding: 10px; height: auto; }
+    .brand-section { flex-direction: row; justify-content: space-between; border-right: none; border-bottom: 2px dashed rgba(0, 51, 102, 0.2); padding-right: 0; padding-bottom: 10px; width: 100%; align-items: center; }
+    .toolbar-content { flex-direction: column; width: 100%; gap: 8px; align-items: stretch; margin-top: 10px; }
+    .tool-group { flex-wrap: wrap; justify-content: center; border-right: none; border-bottom: 1px solid rgba(0, 51, 102, 0.2); padding-right: 0; padding-bottom: 8px; }
+    .tool-group:last-child { border-bottom: none; padding-bottom: 0; }
+    .editor-tabs { flex-wrap: wrap; }
+    .tab-btn { flex: 1 1 50%; border-bottom: 1px solid rgba(255,255,255,0.1); }
+}
 </style>
 </head>
 <body class="light-mode">
@@ -251,9 +220,7 @@ body.dark-mode .search-inputs input::placeholder { color: #aaaaaa; }
 </div>
 
 <script>
-// ==============================================================
 // TOPBAR COLLAPSE LOGIC
-// ==============================================================
 function toggleToolbar() {
     const topbar = document.getElementById('topbar');
     const icon = document.getElementById('collapseIcon');
@@ -272,15 +239,12 @@ function toggleToolbar() {
     }, 300);
 }
 
-// ==============================================================
 // ACE EDITOR & SESSIONS TABS LOGIC
-// ==============================================================
 ace.require("ace/ext/language_tools");
 const editor = ace.edit("htmlInput");
 editor.setTheme("ace/theme/textmate");
 editor.setOptions({ fontSize: "15px", wrap: true, useWorker: false });
 
-// Hijack Default Browser Search (Ctrl+F or Cmd+F)
 editor.commands.addCommand({
     name: "find",
     bindKey: {win: "Ctrl-F", mac: "Command-F"},
@@ -307,14 +271,12 @@ function switchTab(tabId, btn) {
     editor.focus();
 }
 
-// ==============================================================
 // PREVIEW COMPILATION LOGIC
-// ==============================================================
 const previewFrame = document.getElementById('previewFrame');
 
 function getCompiledCode() {
     const htmlCode = sessions.html.getValue();
-    const cssCode = sessions.css.getValue() ? `<style>${sessions.css.getValue()}</style>` : '';
+    const cssCode = sessions.css.getValue() ? `<style>${sessions.css.getValue()}<\/style>` : '';
     const jsCode = sessions.js.getValue() ? `<script>${sessions.js.getValue()}<\/script>` : '';
     const compiledParts = `${cssCode}\n${htmlCode}\n${jsCode}`;
     
@@ -336,9 +298,7 @@ Object.values(sessions).forEach(session => {
     session.on('change', updatePreview);
 });
 
-// ==============================================================
-// LAYOUT TOGGLE (HORIZONTAL / VERTICAL)
-// ==============================================================
+// LAYOUT TOGGLE
 let isHorizontal = false;
 function toggleLayout() {
     isHorizontal = !isHorizontal;
@@ -361,9 +321,7 @@ function toggleLayout() {
     applyResponsiveZoom();
 }
 
-// ==============================================================
-// FILE IMPORT & TITLE EXTRACTION
-// ==============================================================
+// FILE IMPORT
 document.getElementById('fileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -416,7 +374,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 
 function getDocTitle() {
     const match = getCompiledCode().match(/<title>(.*?)<\/title>/i);
-    return (match && match[1]) ? match[1].trim().replace(/[/\\?%*:|"<>]/g, '-') : 'document';
+    return (match && match[1]) ? match[1].trim().replace(/[\/\\?%*:|"<>]/g, '-') : 'document';
 }
 
 function setViewport(device, btn) {
@@ -426,9 +384,7 @@ function setViewport(device, btn) {
     setTimeout(applyResponsiveZoom, 50);
 }
 
-// ==============================================================
 // EXPORT FUNCTIONS
-// ==============================================================
 document.getElementById('btnExportHtml').onclick = () => {
     const link = document.createElement('a');
     link.href = URL.createObjectURL(new Blob([getCompiledCode()], {type:'text/html'}));
@@ -475,9 +431,7 @@ document.getElementById('btnNewTab').onclick = () => {
     win.document.close();
 };
 
-// ==============================================================
 // DRAGGABLE SEARCH PANEL
-// ==============================================================
 const panel = document.getElementById("searchPanel"), header = document.getElementById("searchHeader");
 let isDraggingSearch = false, searchOffset = [0, 0];
 
@@ -527,8 +481,6 @@ document.getElementById('btnSearch').onclick = () => {
 document.getElementById('btnTheme').onclick = () => {
     const isDark = document.body.classList.toggle('dark-mode');
     document.body.classList.toggle('light-mode', !isDark);
-    
-    // Switch between the custom styled monokai and textmate
     editor.setTheme(isDark ? "ace/theme/monokai" : "ace/theme/textmate");
 };
 
@@ -549,9 +501,7 @@ document.getElementById('btnClear').onclick = () => {
     updatePreview(); 
 };
 
-// ==============================================================
-// RESIZER (Supports Horizontal & Vertical)
-// ==============================================================
+// RESIZER
 const resizer = document.getElementById('resizer'), editorBox = document.getElementById('editorBox');
 let isResizing = false;
 
@@ -579,36 +529,29 @@ window.addEventListener('touchmove', doResize, {passive: true});
 window.addEventListener('mouseup', endResize);
 window.addEventListener('touchend', endResize);
 
-// ==============================================================
-// SMART RESPONSIVE ZOOM FOR IFRAME
-// ==============================================================
+// SMART RESPONSIVE ZOOM FOR IFRAME (UPDATED FOR PERFECT CENTERING)
 function applyResponsiveZoom() {
     const doc = previewFrame.contentDocument; if (!doc?.body) return;
     
-    // Reset zoom and transforms to get base measurements
     doc.body.style.zoom = '1';
-    previewFrame.style.transform = 'none';
     
-    // Determine the fixed device width if selected, otherwise use container width
-    let targetWidth = previewFrame.classList.contains('mobile') ? 375 : 
-                      previewFrame.classList.contains('tablet') ? 768 : 
-                      previewFrame.clientWidth;
+    let isMobile = previewFrame.classList.contains('mobile');
+    let isTablet = previewFrame.classList.contains('tablet');
 
-    let containerWidth = document.getElementById('previewBox').clientWidth;
+    let targetWidth = isMobile ? 375 : isTablet ? 768 : previewFrame.clientWidth;
+    let targetHeight = isMobile ? 667 : isTablet ? 1024 : previewFrame.clientHeight;
+
+    let containerBox = document.getElementById('previewBox');
+    let containerWidth = containerBox.clientWidth - 40;
+    let containerHeight = containerBox.clientHeight - 40; 
     
-    // Calculate the scale needed to fit the iframe inside the preview box
-    // Allow a small padding (e.g. 40px)
-    let availableWidth = containerWidth - 40; 
-    
-    if (targetWidth > availableWidth && availableWidth > 0 && targetWidth > 0) {
-        let scaleRatio = availableWidth / targetWidth;
+    if (isMobile || isTablet) {
+        let scaleX = containerWidth / targetWidth;
+        let scaleY = containerHeight / targetHeight;
+        let scaleRatio = Math.min(scaleX, scaleY, 1); 
         
-        // Scale the iframe element itself so the whole device mockup shrinks to fit
         previewFrame.style.transform = `scale(${scaleRatio})`;
-        previewFrame.style.transformOrigin = 'top center';
-        
-        // Adjust the height of the wrapper so it doesn't leave extra empty space below the scaled iframe
-        // (Optional, but helps keep things tidy)
+        previewFrame.style.transformOrigin = 'center center';
     } else {
          previewFrame.style.transform = 'none';
     }

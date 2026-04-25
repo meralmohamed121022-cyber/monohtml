@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MONO-CODE-SHOW</title>
+
 <link rel="icon" type="image/png" href="https://github.com/meralmohamed121022-cyber/Drug-Monograph/blob/main/6_20251129_184528_0005.png?raw=true">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ext-language_tools.min.js"></script>
@@ -24,14 +26,14 @@ body.dark-mode .topbar { background-color: #161b22; border-bottom: 2px solid #00
 body.light-mode .topbar { background-color: #ffffff; border-bottom: 2px solid #003366; }
 .topbar h2 { margin: 0 15px 0 0; font-size: 16px; color: #ff8c00; font-weight: bold; }
 
-/* Contact & Avatar */
+/* Contact Section */
 .contact-section { display: flex; align-items: center; gap: 10px; margin-left: auto; padding-right: 10px; }
 .mo-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #ff8c00; box-shadow: 2px 2px 0px #003366; object-fit: cover; }
 .social-icons { display: flex; gap: 8px; }
 .social-icons a { text-decoration: none; color: #ffffff; background: #003366; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px; border: 1.5px solid #003366; box-shadow: 2px 2px 0px #ff8c00; transition: 0.2s; }
-.social-icons a:hover { transform: translateY(-2px); background: #ff8c00; box-shadow: 2px 2px 0px #003366; }
+.social-icons a:hover { transform: translateY(-2px); background: #ff8c00; border-color: #ff8c00; box-shadow: 2px 2px 0px #003366; }
 
-/* Responsive Device Selectors */
+/* Device Selector */
 .device-selector { display: flex; gap: 5px; background: rgba(0, 51, 102, 0.1); padding: 5px; border-radius: 20px; border: 1px solid #003366; }
 .device-btn { background: none !important; border: none !important; box-shadow: none !important; color: #003366 !important; font-size: 16px !important; padding: 5px 10px !important; border-radius: 15px !important; cursor: pointer; transition: 0.3s; }
 .device-btn.active { background-color: #ff8c00 !important; color: white !important; }
@@ -57,9 +59,9 @@ body.dark-mode .device-btn { color: #c9d1d9 !important; }
 .search-panel { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; padding: 15px; border-radius: 25px; width: 300px; display: none; flex-direction: column; gap: 10px; border: 3px solid #003366; box-shadow: 6px 6px 0px #ff8c00; background: #ffffff; }
 body.dark-mode .search-panel { background: #161b22; }
 
-/* Custom Syntax Colors (Red/Dark Blue) */
-.ace_dark.ace_editor .ace_keyword, .ace_dark.ace_editor .ace_xml.ace_tag { color: #ff7b72 !important; }
-.ace_dark.ace_editor .ace_attribute-name { color: #0066cc !important; font-weight: bold; }
+/* Custom Syntax Color For Dark Mode */
+.ace_dark.ace_editor .ace_keyword, .ace_dark.ace_editor .ace_xml.ace_tag { color: #ff7b72 !important; } /* Red */
+.ace_dark.ace_editor .ace_attribute-name { color: #0066cc !important; font-weight: bold; } /* Dark Blue */
 .ace_dark.ace_editor .ace_string { color: #a6e22e !important; }
 </style>
 </head>
@@ -75,7 +77,10 @@ body.dark-mode .search-panel { background: #161b22; }
         <button class="device-btn" onclick="setViewport('mobile', this)"><i class="fas fa-mobile-alt"></i></button>
     </div>
     <button onclick="formatCode()">✨ Format</button>
-    <label class="file-upload-label">📁 Import<input type="file" id="fileInput" style="display:none"></label>
+    
+    <button onclick="document.getElementById('fileInput').click()">📁 Import</button>
+    <input type="file" id="fileInput" accept=".html,.json,.txt" style="display:none">
+
     <button id="btnSearch">🔍 Search</button>
     <button id="btnExportHtml">📄 HTML</button>
     <button id="btnExportJson">📦 JSON</button>
@@ -100,7 +105,7 @@ body.dark-mode .search-panel { background: #161b22; }
                 <span onclick="closeSearch()" style="cursor:pointer">✖</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:20px; border:2px solid #003366; background:#f0f4f8; margin-top:10px;">
-                <input type="text" id="searchInput" placeholder="Find..." style="border:none; background:transparent; outline:none; flex:1; font-weight:bold; color:#003366;">
+                <input type="text" id="searchInput" placeholder="Find...">
                 <span id="matchStatus" style="font-size:11px; font-weight:bold; color:#ff8c00;">0 matches</span>
             </div>
             <input type="text" id="replaceInput" placeholder="Replace..." style="padding:8px 12px; border-radius:20px; border:2px solid #003366; background:#f0f4f8; font-weight:bold; color:#003366; outline:none;">
@@ -117,6 +122,7 @@ body.dark-mode .search-panel { background: #161b22; }
 </div>
 
 <script>
+// Initializing Ace
 const editor = ace.edit("htmlInput");
 editor.setTheme("ace/theme/textmate");
 editor.session.setMode("ace/mode/html");
@@ -128,6 +134,18 @@ const updatePreview = () => {
     previewFrame.onload = () => applyResponsiveZoom();
 };
 editor.session.on('change', updatePreview);
+
+// Import Logic - تم الإصلاح هنا
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        editor.setValue(ev.target.result, -1);
+        updatePreview();
+    };
+    reader.readAsText(file);
+});
 
 function getDocTitle() {
     const match = editor.getValue().match(/<title>(.*?)<\/title>/i);
@@ -149,8 +167,8 @@ document.getElementById('btnExportHtml').onclick = () => {
 };
 
 document.getElementById('btnExportJson').onclick = () => {
-    const data = { title: getDocTitle(), code: editor.getValue(), timestamp: new Date() };
     const link = document.createElement('a');
+    const data = { title: getDocTitle(), code: editor.getValue() };
     link.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 4)], {type:'application/json'}));
     link.download = getDocTitle() + '.json';
     link.click();
@@ -184,7 +202,7 @@ document.getElementById('btnNewTab').onclick = () => {
     win.document.close();
 };
 
-// Search & Drag
+// Search Drag
 const panel = document.getElementById("searchPanel"), header = document.getElementById("searchHeader");
 let isDragging = false, offset = [0, 0];
 header.onmousedown = (e) => { isDragging = true; offset = [panel.offsetLeft - e.clientX, panel.offsetTop - e.clientY]; };
@@ -209,13 +227,6 @@ document.getElementById('btnTheme').onclick = () => {
 
 function formatCode() { editor.setValue(html_beautify(editor.getValue(), { indent_size: 4 }), -1); }
 document.getElementById('btnClear').onclick = () => { editor.setValue(''); updatePreview(); };
-
-// Resizer
-const resizer = document.getElementById('resizer'), editorBox = document.getElementById('editorBox');
-let isResizing = false;
-resizer.onmousedown = () => isResizing = true;
-window.onmousemove = (e) => { if (isResizing) { let p = (e.clientX / window.innerWidth) * 100; if (p > 10 && p < 90) editorBox.style.width = p + '%'; } };
-window.onmouseup = () => isResizing = false;
 
 function applyResponsiveZoom() {
     const doc = previewFrame.contentDocument; if (!doc?.body) return;

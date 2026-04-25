@@ -361,7 +361,6 @@ function toggleLayout() {
     
     if (isHorizontal) {
         mainArea.classList.add('horizontal-layout');
-        // تصفير العرض عشان ياخد 100% من الكلاس الجديد
         editorBox.style.width = ''; 
         editorBox.style.height = '50%';
         previewBox.style.width = '';
@@ -369,7 +368,6 @@ function toggleLayout() {
         btn.innerHTML = '<i class="fas fa-columns"></i> Vertical';
     } else {
         mainArea.classList.remove('horizontal-layout');
-        // تصفير الارتفاع عشان يرجع ياخد 100% في الوضع الرأسي
         editorBox.style.height = ''; 
         editorBox.style.width = '50%';
         previewBox.style.height = '';
@@ -377,12 +375,12 @@ function toggleLayout() {
         btn.innerHTML = '<i class="fas fa-layer-group"></i> Horizontal';
     }
     
-    // تأكيد إعادة التحجيم بعد التغيير
     setTimeout(() => {
         editor.resize();
         applyResponsiveZoom();
     }, 50);
 }
+
 // FILE IMPORT
 document.getElementById('fileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
@@ -494,61 +492,150 @@ document.getElementById('btnNewTab').onclick = () => {
 };
 
 // DRAGGABLE SEARCH PANEL
-const panel = document.getElementById("searchPanel"), header = document.getElementById("searchHeader");
-let isDraggingSearch = false, searchOffset = [0, 0];
+const panel = document.getElementById("searchPanel");
+let isDraggingSearch = false;
+let searchOffset = [0, 0];
 
 const startDragSearch = (e) => {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "BUTTON" || e.target.innerText === "✖") return;
     isDraggingSearch = true;
+    const rect = panel.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    searchOffset = [panel.offsetLeft - clientX, panel.offsetTop - clientY];
+    searchOffset = [rect.left - clientX, rect.top - clientY];
+    panel.style.position = "fixed";
+    panel.style.margin = "0";
+    panel.style.transform = "none";
+    panel.style.left = rect.left + "px";
+    panel.style.top = rect.top + "px";
+    panel.style.zIndex = "99999";
 };
+
 const dragSearch = (e) => {
     if (!isDraggingSearch) return;
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     panel.style.left = (clientX + searchOffset[0]) + "px";
     panel.style.top = (clientY + searchOffset[1]) + "px";
-    panel.style.transform = "none";
 };
-const endDragSearch = () => { isDraggingSearch = false; };
 
-header.addEventListener('mousedown', startDragSearch);
-header.addEventListener('touchstart', startDragSearch, {passive: true});
-document.addEventListener('mousemove', dragSearch);
-document.addEventListener('touchmove', dragSearch, {passive: true});
-document.addEventListener('mouseup', endDragSearch);
-document.addEventListener('touchend', endDragSearch);
+const endDragSearch = () => {
+    isDraggingSearch = false;
+};
+
+panel.addEventListener("mousedown", startDragSearch);
+panel.addEventListener("touchstart", startDragSearch, {passive: true});
+document.addEventListener("mousemove", dragSearch);
+document.addEventListener("touchmove", dragSearch, {passive: true});
+document.addEventListener("mouseup", endDragSearch);
+document.addEventListener("touchend", endDragSearch);
 
 function closeSearch() { 
-    panel.style.display = 'none'; 
-    editor.focus(); 
+    panel.style.display = "none";
+    editor.focus();
 }
 
-// تحديث البحث عند الكتابة
-document.getElementById('searchInput').oninput = function() {
+function updateMatchCount() {
+    const searchInput = document.getElementById("searchInput").value;
+    const status = document.getElementById("matchStatus");
+
+    if (!searchInput) {
+        status.innerText = "0 matches";
+        return;
+    }
+
+    editor.$search.setOptions({
+        needle: searchInput,
+        caseSensitive: false,
+        wholeWord: false,
+        regExp: false,
+        wrap: true
+    });
+
+    const allMatches = editor.$search.findAll(editor.session);
+    const total = allMatches.length;
+
+    if (total === 0) {
+        status.innerText = "0 matches";
+        return;
+    }
+
+    const range = editor.getSelectionRange();
+    let currentIndex = allMatches.findIndex(m => m.start.row === range.start.row && m.start.column === range.start.column);
+
+    if (currentIndex === -1) {
+        currentIndex = allMatches.findIndex(m => m.start.row > range.start.row || (m.start.row === range.start.row && m.start.column >= range.start.column));
+        if (currentIndex === -1) currentIndex = 0;
+    }
+
+    status.innerText = (currentIndex + 1) + " of " + total;
+}
+
+document.getElementById("searchInput").oninput = function() {
+    const val = this.value;
+    if (val) {
+        editor.find(val, {
+            skipCurrent: false,
+            backwards: false,
+            wrap: true,
+            caseSensitive: false,
+            wholeWord: false,
+            regExp: false
+        });
+    }
     updateMatchCount();
 };
 
-// فتح لوحة البحث وتحديث العداد فوراً
-document.getElementById('btnSearch').onclick = () => {
-    panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
-    if (panel.style.display === 'flex') {
-        const input = document.getElementById('searchInput');
+document.getElementById("btnSearch").onclick = () => {
+    panel.style.display = panel.style.display === "flex" ? "none" : "flex";
+    if (panel.style.display === "flex") {
+        const input = document.getElementById("searchInput");
         input.focus();
         let selectedText = editor.getSelectedText();
         if(selectedText) {
             input.value = selectedText;
+            editor.find(selectedText, { wrap: true });
             updateMatchCount();
         }
     }
 };
 
-document.getElementById('btnTheme').onclick = () => {
-    const isDark = document.body.classList.toggle('dark-mode');
-    document.body.classList.toggle('light-mode', !isDark);
+document.getElementById("btnTheme").onclick = () => {
+    const isDark = document.body.classList.toggle("dark-mode");
+    document.body.classList.toggle("light-mode", !isDark);
     editor.setTheme(isDark ? "ace/theme/monokai" : "ace/theme/textmate");
 };
+
+setTimeout(() => {
+    const searchBtns = document.querySelectorAll("#searchPanel button");
+    if(searchBtns.length >= 4) {
+        searchBtns[0].removeAttribute("onclick");
+        searchBtns[0].onclick = () => {
+            editor.findPrevious({ wrap: true });
+            updateMatchCount();
+        };
+        
+        searchBtns[1].removeAttribute("onclick");
+        searchBtns[1].onclick = () => {
+            editor.findNext({ wrap: true });
+            updateMatchCount();
+        };
+        
+        searchBtns[2].removeAttribute("onclick");
+        searchBtns[2].onclick = () => {
+            const replaceStr = document.getElementById("replaceInput").value;
+            editor.replace(replaceStr);
+            updateMatchCount();
+        };
+        
+        searchBtns[3].removeAttribute("onclick");
+        searchBtns[3].onclick = () => {
+            const replaceStr = document.getElementById("replaceInput").value;
+            editor.replaceAll(replaceStr);
+            updateMatchCount();
+        };
+    }
+}, 500);
 
 function formatCode() { 
     let val = editor.getValue();
@@ -633,48 +720,6 @@ function applyResponsiveZoom() {
 }
 
 new ResizeObserver(() => applyResponsiveZoom()).observe(document.getElementById('previewBox'));
-
-// دالة تحديث عداد البحث المتقدمة (X of Y) - النسخة الموثوقة
-function updateMatchCount() {
-    const searchInput = document.getElementById('searchInput').value;
-    const status = document.getElementById('matchStatus');
-    
-    if (!searchInput) {
-        status.innerText = "0 matches";
-        return;
-    }
-
-    // تهيئة محرك البحث لضمان أحدث داتا
-    editor.$search.setOptions({
-        needle: searchInput,
-        caseSensitive: false,
-        wholeWord: false,
-        regExp: false
-    });
-
-    // جلب كل النتائج
-    const allMatches = editor.$search.findAll(editor.session);
-    const total = allMatches.length;
-    
-    // تحديد مكان النتيجة الحالية
-    const cursor = editor.getCursorPosition();
-    let current = 0;
-    
-    if (total > 0) {
-        // نوجد أول نتيجة تبدأ بعد أو عند مكان الكرسور الحالي
-        current = allMatches.findIndex(range => {
-            return range.start.row > cursor.row || 
-                   (range.start.row === cursor.row && range.start.column >= cursor.column);
-        });
-        
-        // لو ملقاش حاجة يبقى إحنا في آخر واحدة
-        if (current === -1) current = total;
-        else current = current + 1;
-    }
-
-    status.innerText = (total > 0) ? `${current} of ${total}` : "0 matches";
-}
-
 </script>
 <script>
     // 1. منع الكليك يمين تماماً
@@ -695,6 +740,7 @@ function updateMatchCount() {
 
     // 3. تعطيل خاصية السحب والإفلات للأكواد (اختياري)
     document.addEventListener('dragstart', (e) => e.preventDefault());
+</script>
 </script>
 </body>
 </html>

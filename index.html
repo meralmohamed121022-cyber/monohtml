@@ -183,25 +183,6 @@ body.dark-mode .editor-box { background: #001122 !important; }
 .main-area.horizontal-layout .preview-box { width: 100% !important; height: 50%; order: 1; }
 .main-area.horizontal-layout .resizer { width: 100% !important; height: 8px; cursor: row-resize; order: 2; border-top: 2px solid #003366; }
 .main-area.horizontal-layout .editor-box { width: 100% !important; height: 50%; order: 3; }
-/* تكبير شريط السكرول لمحرر الأكواد لسهولة السحب باللمس */
-.ace_scrollbar-v {
-    width: 18px !important; /* عرض مناسب جدا لصباع الإيد */
-}
-.ace_scrollbar-v::-webkit-scrollbar {
-    width: 18px;
-}
-.ace_scrollbar-v::-webkit-scrollbar-track {
-    background: rgba(0, 51, 102, 0.05);
-    border-left: 1px solid rgba(0, 51, 102, 0.1);
-}
-.ace_scrollbar-v::-webkit-scrollbar-thumb {
-    background-color: #ff8c00;
-    border-radius: 10px;
-    border: 4px solid #ffffff; /* بيعمل مسافة حوالين اللون عشان الشكل */
-}
-body.dark-mode .ace_scrollbar-v::-webkit-scrollbar-thumb {
-    border: 4px solid #001122;
-}
 </style>
 </head>
 <body class="light-mode">
@@ -743,6 +724,47 @@ editor.commands.addCommand({
         closeSearch();
     }
 });
+// تفعيل السحب السريع باللمس على شريط التمرير في الموبايل
+setTimeout(() => {
+    const scrollbar = document.querySelector('.ace_scrollbar-v');
+    if (!scrollbar) return;
+    
+    let isDraggingAceScroll = false;
+
+    const handleTouchScroll = (e) => {
+        const rect = scrollbar.getBoundingClientRect();
+        // تحديد مكان صباعك على الشريط
+        let touchY = e.touches[0].clientY - rect.top;
+        
+        // منع الخروج برا حدود الشريط
+        touchY = Math.max(0, Math.min(touchY, rect.height));
+        
+        // حساب النسبة المئوية
+        const percentage = touchY / rect.height;
+        
+        // تحويل النسبة لرقم السطر والذهاب إليه فوراً
+        const totalLines = editor.session.getLength();
+        const targetLine = Math.floor(percentage * totalLines);
+        editor.scrollToRow(targetLine);
+    };
+
+    scrollbar.addEventListener('touchstart', (e) => {
+        isDraggingAceScroll = true;
+        handleTouchScroll(e);
+        e.preventDefault(); // لمنع التداخل مع زووم أو سحب الموبايل العادي
+    }, {passive: false});
+
+    document.addEventListener('touchmove', (e) => {
+        if (isDraggingAceScroll) {
+            handleTouchScroll(e);
+            e.preventDefault();
+        }
+    }, {passive: false});
+
+    document.addEventListener('touchend', () => {
+        isDraggingAceScroll = false;
+    });
+}, 1000); // تأخير ثانية لضمان تحميل المحرر بالكامل
 </script>
 </script>
 </body>

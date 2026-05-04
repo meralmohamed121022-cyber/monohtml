@@ -84,17 +84,8 @@ body.dark-mode .brand-section { border-right: 2px dashed rgba(255, 255, 255, 0.1
 
 /* Avatar & Social */
 .mo-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #ff8c00; box-shadow: 2px 2px 0px #003366; object-fit: cover; }
-.social-icons { 
-    display: flex; 
-    flex-direction: row; /* يخليهم بالعرض */
-    gap: 6px; 
-}
-.contact-section { 
-    display: flex; 
-    align-items: center; 
-    gap: 10px; /* المسافة بين الصورة والأيقونات */
-    transition: 0.3s; 
-}
+.social-icons { display: flex; flex-direction: row; gap: 6px; }
+.contact-section { display: flex; align-items: center; gap: 10px; transition: 0.3s; }
 .social-icons a { text-decoration: none; color: #ffffff; background: #003366; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; border: 1.5px solid #003366; box-shadow: 2px 2px 0px #ff8c00; transition: 0.2s; }
 
 /* Toolbar Content */
@@ -113,8 +104,8 @@ body.dark-mode .brand-section { border-right: 2px dashed rgba(255, 255, 255, 0.1
 /* Main Area */
 .main-area { display: flex; flex: 1; width: 100%; overflow: hidden; position: relative; }
 
-/* Code Box - Forced Light Theme */
-.editor-box { width: 50%; height: 100%; display: flex; flex-direction: column; position: relative; background: #ffffff !important; } 
+/* Code Box - Narrowed to 65% for better mobile visibility */
+.editor-box { width: 65%; height: 100%; display: flex; flex-direction: column; position: relative; background: #ffffff !important; order: 1; } 
 body.dark-mode .editor-box { background: #001122 !important; }
 
 .editor-tabs { display: flex; background: #003366; }
@@ -122,21 +113,37 @@ body.dark-mode .editor-box { background: #001122 !important; }
 .tab-btn.active { background: #ff8c00; color: #ffffff; }
 
 #htmlInput { flex: 1; width: 100%; height: 100%; font-size: 15px; }
-
-/* SYNTAX COLORS - White Background for Light Mode */
+/* Syntax Colors - توزيعه الألوان لتطابق الصورة تماماً */
 .ace_editor { background-color: #ffffff !important; color: #000000 !important; }
 .ace_gutter { background-color: #f0f0f0 !important; color: #333333 !important; border-right: 1px solid #cccccc !important; }
+
+/* 1. اللون الأحمر للوسوم (مثل div, h2, button, img) وأقواسها <> */
+.ace_xml.ace_tag, 
+.ace_html.ace_tag,
+.ace_xml.ace_tag-name, 
+.ace_html.ace_tag-name { color: #881280 !important; } /* أحمر أرجواني داكن مثل الصورة */
+
+/* 2. اللون البرتقالي/البني للخصائص (مثل class, id, onclick, src) */
+.ace_xml.ace_attribute-name, 
+.ace_html.ace_attribute-name { color: #994500 !important; }
+
+/* 3. اللون الأزرق للقيم التي بين علامات التنصيص "..." */
+.ace_xml.ace_string, 
+.ace_html.ace_string { color: #1a1aa6 !important; }
+
+/* 4. اللون الأسود لعلامة اليساوي = لكي لا تختفي */
+.ace_xml.ace_keyword.ace_operator, 
+.ace_html.ace_keyword.ace_operator { color: #000000 !important; }
 
 /* SYNTAX COLORS - Dark Mode Override */
 .ace_dark.ace_editor { background-color: #001122 !important; color: #d4d4d4 !important; }
 .ace_dark.ace_editor .ace_gutter { background-color: #001122 !important; color: #668099 !important; border-right: 1px solid #003366 !important; }
-
-/* Preview Box - Deep Blue Background Always */
+/* Preview Box - Expanded to 35% */
 .preview-box { 
     flex: 1; height: 100%; display: flex; flex-direction: column; 
-    background: #001f3f !important; /* Deep Blue behind Device */
+    background: #001f3f !important; 
     overflow: hidden; align-items: center; justify-content: center; 
-    padding: 20px; transition: 0.3s; box-sizing: border-box;
+    padding: 20px; transition: 0.3s; box-sizing: border-box; order: 3;
 }
 
 #previewFrame { 
@@ -149,36 +156,30 @@ body.dark-mode .editor-box { background: #001122 !important; }
 #previewFrame.tablet { width: 768px !important; height: 1024px !important; flex: none; border: 16px solid #1a1a1a; border-radius: 24px; margin: 0 auto; }
 
 /* Resizer */
-.resizer { width: 6px; background-color: #ff8c00; cursor: col-resize; z-index: 500; transition: 0.2s; border-left: 1px solid #003366; touch-action: none; }
+.resizer { width: 6px; background-color: #ff8c00; cursor: col-resize; z-index: 500; transition: 0.2s; border-left: 1px solid #003366; touch-action: none; order: 2; }
 
-/* Search Panel */
+/* Search Panel - Corrected Position based on last image */
 .search-panel { 
-    position: absolute; top: 50px; left: 50%; transform: translateX(-50%); z-index: 2000; 
-    padding: 15px; border-radius: 25px; width: 300px; display: none; flex-direction: column; gap: 10px; 
+    position: fixed; 
+    top: 100px; /* Aligned vertically */
+    right: 28%; /* Centered over the gap to not hide mobile */
+    z-index: 2000; 
+    padding: 12px; border-radius: 20px; width: 320px; display: none; flex-direction: column; gap: 8px; 
     border: 3px solid #003366; box-shadow: 6px 6px 0px #ff8c00; background: #ffffff; 
 }
 
-/* MOBILE RESPONSIVE MEDIA QUERIES */
+/* Mobile Responsive */
 @media (max-width: 768px) {
     .topbar { flex-direction: column; padding: 10px; height: auto; }
-.brand-section { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 10px; 
-    border-right: 2px dashed rgba(0, 51, 102, 0.2); 
-    padding-right: 15px; 
-}    .toolbar-content { flex-direction: column; width: 100%; gap: 8px; align-items: stretch; margin-top: 10px; }
-    .tool-group { flex-wrap: wrap; justify-content: center; border-right: none; border-bottom: 1px solid rgba(0, 51, 102, 0.2); padding-right: 0; padding-bottom: 8px; }
-    .tool-group:last-child { border-bottom: none; padding-bottom: 0; }
-    .editor-tabs { flex-wrap: wrap; }
-    .tab-btn { flex: 1 1 50%; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .brand-section { display: flex; flex-direction: column; gap: 10px; border-right: none; padding-right: 0; }
+    .toolbar-content { flex-direction: column; width: 100%; gap: 8px; align-items: stretch; margin-top: 10px; }
+    .tool-group { flex-wrap: wrap; justify-content: center; border-right: none; border-bottom: 1px solid rgba(0, 51, 102, 0.2); padding-bottom: 8px; }
+    .editor-box { width: 100% !important; height: 50%; }
+    .preview-box { width: 100% !important; height: 50%; }
+    .search-panel { right: 10px; width: 90%; top: 150px; }
 }
-/* الوضع الرأسي الافتراضي */
-.editor-box { width: 50%; height: 100%; display: flex; flex-direction: column; order: 1; }
-.resizer { width: 6px; background-color: #ff8c00; cursor: col-resize; z-index: 500; order: 2; }
-.preview-box { flex: 1; height: 100%; display: flex; flex-direction: column; order: 3; }
 
-/* الوضع الأفقي (الرفيو فوق والأكواد تحت) */
+/* Layout Management */
 .main-area.horizontal-layout { flex-direction: column; }
 .main-area.horizontal-layout .preview-box { width: 100% !important; height: 50%; order: 1; }
 .main-area.horizontal-layout .resizer { width: 100% !important; height: 8px; cursor: row-resize; order: 2; border-top: 2px solid #003366; }

@@ -237,9 +237,6 @@ body.dark-mode .editor-box { background: #001122 !important; }
     <div class="editor-box" id="editorBox">
         <div class="editor-tabs">
             <button class="tab-btn active" onclick="switchTab('all', this)"><i class="fa-solid fa-layer-group"></i> All Code</button>
-            <button class="tab-btn" onclick="switchTab('html', this)"><i class="fab fa-html5"></i> HTML</button>
-            <button class="tab-btn" onclick="switchTab('css', this)"><i class="fab fa-css3-alt"></i> CSS</button>
-            <button class="tab-btn" onclick="switchTab('js', this)"><i class="fab fa-js"></i> JS</button>
         </div>
 
         <div id="searchPanel" class="search-panel" style="padding: 8px; width: 300px; background: #ffffff; border: 3px solid #003366; border-radius: 20px; box-shadow: 4px 4px 0px #ff8c00; flex-direction: column; gap: 8px; display: none;">
@@ -687,25 +684,7 @@ function applyResponsiveZoom() {
 new ResizeObserver(() => applyResponsiveZoom()).observe(document.getElementById('previewBox'));
 </script>
 <script>
-    // 1. منع الكليك يمين تماماً
-    document.addEventListener('contextmenu', event => event.preventDefault());
 
-    // 2. منع اختصارات لوحة المفاتيح (F12, Ctrl+U, Ctrl+Shift+I, Ctrl+S)
-    document.onkeydown = function(e) {
-        if (e.keyCode == 123 || // F12
-            (e.ctrlKey && e.keyCode == 85) || // Ctrl+U (View Source)
-            (e.ctrlKey && e.shiftKey && e.keyCode == 73) || // Ctrl+Shift+I (Inspect)
-            (e.ctrlKey && e.shiftKey && e.keyCode == 74) || // Ctrl+Shift+J (Console)
-            (e.ctrlKey && e.keyCode == 83) || // Ctrl+S (Save)
-            (e.ctrlKey && e.keyCode == 72)    // Ctrl+H (History)
-        ) {
-            return false;
-        }
-    };
-
-    // 3. تعطيل خاصية السحب والإفلات للأكواد (اختياري)
-    
-document.addEventListener('dragstart', (e) => e.preventDefault());
 window.closeSearch = function() { 
     document.getElementById("searchPanel").style.display = "none";
     editor.focus();

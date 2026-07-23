@@ -317,18 +317,7 @@ function switchTab(tabId, btn) {
 const previewFrame = document.getElementById('previewFrame');
 
 function getCompiledCode() {
-    const htmlCode = sessions.html.getValue();
-    const cssCode = sessions.css.getValue() ? `<style>${sessions.css.getValue()}</style>` : '';
-    const jsCode = sessions.js.getValue() ? `<script>${sessions.js.getValue()}<\/script>` : '';
-    const compiledParts = `${cssCode}\n${htmlCode}\n${jsCode}`;
-    
-    const allCode = sessions.all.getValue();
-    
-    if (htmlCode || sessions.css.getValue() || sessions.js.getValue()) {
-        return compiledParts;
-    } else {
-        return allCode;
-    }
+    return sessions.all.getValue();
 }
 
 const updatePreview = () => { 
@@ -380,42 +369,6 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
         let code = ev.target.result;
         sessions.all.setValue(code);
         
-        let cssMatch = code.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
-        let jsMatch = code.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
-        let extractedCss = "", extractedJs = "", extractedHtml = code;
-
-        if (cssMatch) {
-            cssMatch.forEach(block => {
-                let inner = block.replace(/<style[^>]*>/i, "").replace(/<\/style>/i, "");
-                extractedCss += inner + "\n";
-                extractedHtml = extractedHtml.replace(block, ""); 
-            });
-            sessions.css.setValue(extractedCss.trim());
-        } else {
-            sessions.css.setValue("");
-        }
-
-        if (jsMatch) {
-            jsMatch.forEach(block => {
-                if(!block.includes("src=")) {
-                    let inner = block.replace(/<script[^>]*>/i, "").replace(/<\/script>/i, "");
-                    extractedJs += inner + "\n";
-                    extractedHtml = extractedHtml.replace(block, ""); 
-                }
-            });
-            sessions.js.setValue(extractedJs.trim());
-        } else {
-            sessions.js.setValue("");
-        }
-        
-        if(cssMatch || jsMatch) {
-             sessions.html.setValue(extractedHtml.trim());
-             switchTab('html', document.querySelectorAll('.tab-btn')[1]);
-        } else {
-             sessions.html.setValue("");
-             switchTab('all', document.querySelectorAll('.tab-btn')[0]);
-        }
-
         updatePreview();
     };
     reader.readAsText(file);
